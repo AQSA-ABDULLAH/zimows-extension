@@ -1,6 +1,6 @@
 import React from "react";
 import Footer from "../footer/Footer";
-import HistoryCard from "../card/HistoryCard";
+import HistoryList from "../card/HistoryList";
 
 function History() {
   return (
@@ -26,7 +26,7 @@ function History() {
           />
         </div>
       </div>
-      <HistoryCard />
+     <HistoryList />
       <Footer />
     </div>
   );
