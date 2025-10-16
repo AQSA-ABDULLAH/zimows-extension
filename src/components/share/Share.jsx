@@ -16,8 +16,8 @@ export default function Share() {
       </div>
 
       <div className="flex justify-between items-center mb-[28px]">
-        <img src="/images/share/Arrow Left W.svg" alt="Left arrow" />
-        <img src="/images/share/Arrow Right W.svg" alt="Right arrow" />
+        <img src="/images/share/Arrow Left W.svg" alt="Left arrow" className='h-[25.52px]'/>
+        <img src="/images/share/Arrow Right W.svg" alt="Right arrow" className='h-[25.52px]'/>
       </div>
     </div>
   );

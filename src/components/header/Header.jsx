@@ -3,7 +3,7 @@ import React from 'react'
 function Header() {
   return (
     <div>
-       <div className="w-full flex justify-between items-center m-[40px]">
+       <div className="w-full flex justify-between items-center p-[40px]">
       <div>
         <img src="images/header/ZIMO WS Duo Chrome B.svg" alt="Zimo Logo" className='h-[20px]' />
       </div>

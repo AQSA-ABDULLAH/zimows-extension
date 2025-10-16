@@ -1,11 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
+import Home from './components/home/Home';
 
 function App() {
   return (
-    <div className='bg-black flex justify-center items-center'>
-      dhadjhag
-      dhasdajh
+    <div className='w-[100%] overflow-hidden'>
+      <Home />
     </div>
   );
 }
