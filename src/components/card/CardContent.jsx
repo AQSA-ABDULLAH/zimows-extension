@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'react-dom'
 
 export default function CardContent() {
   return (
@@ -9,8 +8,8 @@ export default function CardContent() {
       </div>
 
       <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1px] ml-[10px] leading-none">
-        <div className="flex items-center gap-[43px]">
-          <img src="images/card/logo/bbc-log.png" alt="BBC" className="h-[30px]" />
+        <div className="flex items-center gap-[43px] mt-[8px]">
+          <img src="images/card/logo/amex dls-logo-bluebox-solid.svg" alt="BBC" className="h-[30px] w-[30px]" />
           <a 
             href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo" 
             target="_blank" 
@@ -24,12 +23,12 @@ export default function CardContent() {
           Deadly fighting erupts between Hamas and Palestinian clan in Gaza
         </h3>
 
-        <Link 
-          href="#" 
+        <a 
+          href="/" 
           className="tracking-[1.5px] break-all cursor-default" 
         >
           https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo
-        </Link>
+        </a>
 
         <div className="flex gap-[30px] leading-[10px]">
           <span>17:23</span>

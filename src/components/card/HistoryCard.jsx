@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "react-dom"
 
 function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
   return (
@@ -31,13 +30,14 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
         </h3>
 
         {/* Full Link */}
-        <Link
+        <a
+        href="/"
           target="_blank"
           rel="noopener noreferrer"
           className="tracking-[1.5px] break-all cursor-default"
         >
           {fullUrl}
-        </Link>
+        </a>
 
         {/* Date & Time */}
         <div className="flex gap-[30px] leading-[10px]">
