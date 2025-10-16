@@ -3,8 +3,8 @@ import React from 'react';
 export default function CardContent() {
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
-      <div className="line">
-        <img src="/images/card/WS Chrome Line.svg" alt="line" />
+      <div className="">
+        <img src="/images/card/WS Chrome Line.svg" alt="line" className='w-[1px] h-[195px]' />
       </div>
 
       <div className="flex flex-col font-[12px] tracking-[1px] ml-[10px] leading-none">
@@ -40,7 +40,7 @@ export default function CardContent() {
           <img src="/images/card/Open in New Window.svg" alt="open window" className='h-[22px] cursor-pointer' />
           <img src="/images/card/Copy Icon B.svg" alt="copy" className='h-[22px] cursor-pointer' />
           <img src="/images/card/Share Icon B.svg" alt="share" className='h-[22px] cursor-pointer' />
-          <img src="/images/Delete Icon W.svg" alt="delete" className='h-[22px] cursor-pointer' />
+          <img src="/images/card/Delete Icon B.svg" alt="delete" className='h-[22px] cursor-pointer' />
         </div>
       </div>
     </div>

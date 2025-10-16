@@ -1,12 +1,11 @@
 import React from 'react';
 import Footer from "../footer/Footer";
-import Share from "../share/Share";
 import CardContent from "../card/CardContent";
+import HistoryCard from '../card/HistoryCard';
 
 function History() {
   return (
     <div className="">
-     
       <div className="w-full flex justify-between items-center p-[40px]">
       <div>
         <img
@@ -23,8 +22,7 @@ function History() {
         />
       </div>
     </div>
-      <CardContent />
-      <Share />
+      <HistoryCard />
       <Footer />
     </div>
   );
