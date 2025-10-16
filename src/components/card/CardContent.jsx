@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'react-dom'
 
 export default function CardContent() {
   return (
@@ -23,12 +24,12 @@ export default function CardContent() {
           Deadly fighting erupts between Hamas and Palestinian clan in Gaza
         </h3>
 
-        <a 
-          href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo" 
-          className="tracking-[1.5px] text-[#000000] break-all no-underline" 
+        <Link 
+          href="#" 
+          className="tracking-[1.5px] break-all cursor-default" 
         >
           https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo
-        </a>
+        </Link>
 
         <div className="flex gap-[30px] leading-[10px]">
           <span>17:23</span>

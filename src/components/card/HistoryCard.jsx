@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "react-dom"
 
 function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
   return (
@@ -11,7 +12,7 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
         />
       </div>
 
-      <div className="flex flex-col text-[12px] tracking-[1px] ml-[10px] leading-none">
+      <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1px] ml-[10px] leading-none">
         {/* Top Section */}
         <div className="flex items-center gap-[43px] h-[30px]">
           <img src={icon} alt="Logo" className="h-[30px] w-[30px]" />
@@ -19,35 +20,33 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
             href={fullUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#000] no-underline text-[12px] leading-none"
           >
             {shortUrl}
           </a>
         </div>
 
         {/* Title */}
-        <h3 className="tracking-[1.8px] leading-[18px] mt-[19.8px] text-[12px]">
+        <h3 className="tracking-[1.8px] leading-[18px]">
           {title}
         </h3>
 
         {/* Full Link */}
-        <a
-          href={fullUrl}
+        <Link
           target="_blank"
           rel="noopener noreferrer"
-          className="tracking-[1.5px] text-[#000000] break-all no-underline"
+          className="tracking-[1.5px] break-all cursor-default"
         >
           {fullUrl}
-        </a>
+        </Link>
 
         {/* Date & Time */}
-        <div className="flex gap-[30px] mt-[18px] text-[12px] leading-[10px]">
+        <div className="flex gap-[30px] leading-[10px]">
           <span>{time}</span>
           <span>{date}</span>
         </div>
 
         {/* Action Icons */}
-        <div className="flex mt-[20px] gap-[50px]">
+        <div className="flex gap-[50px]">
           <img
             src="/images/card/Open in New Window.svg"
             alt="open window"
@@ -67,6 +66,11 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
             src="/images/card/Delete Icon B.svg"
             alt="delete"
             className="h-[22px] cursor-pointer"
+          />
+          <img
+          src="/images/card/Counter - URL Clicks.svg"
+          alt="counter click"
+          className="h-[22px] cursor-pointer"
           />
         </div>
       </div>
