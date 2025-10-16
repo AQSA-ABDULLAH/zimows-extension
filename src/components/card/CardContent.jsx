@@ -4,7 +4,7 @@ export default function CardContent() {
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
       <div className="">
-        <img src="/images/card/WS Chrome Line.svg" alt="line" className='w-[1px] h-[195px]' />
+        <img src="/images/card/Copy Icon B.svg" alt="line" className='w-[1px] h-[195px]' />
       </div>
 
       <div className="flex flex-col font-[12px] tracking-[1px] ml-[10px] leading-none">
