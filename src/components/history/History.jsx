@@ -5,11 +5,13 @@ import HistoryList from "../card/HistoryList";
 function History() {
   return (
     <div className="">
+        <div className="absolute top-0 left-0">
       <img
         src="images/header/RECENT B.svg"
         alt="Zimo Logo"
         className="h-[10px] w-[67.72px]"
       />
+      </div>
       <div className="w-full flex justify-between items-center p-[40px]">
         <div>
           <img
