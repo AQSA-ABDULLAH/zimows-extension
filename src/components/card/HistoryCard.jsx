@@ -14,7 +14,7 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
       <div className="flex flex-col text-[12px] tracking-[1px] ml-[10px] leading-none">
         {/* Top Section */}
         <div className="flex items-center gap-[43px] h-[30px]">
-          <img src={icon} alt="Logo" className="h-[30px]" />
+          <img src={icon} alt="Logo" className="h-[30px] w-[30px]" />
           <a
             href={fullUrl}
             target="_blank"

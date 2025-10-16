@@ -14,7 +14,7 @@ export default function CardContent() {
             href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-[#000] decoration-none text-[12px] leading-none"
+            className="text-[#000] no-underline text-[12px] leading-none"
           >
             zimo.ws/OFBxVT
           </a>
@@ -26,7 +26,7 @@ export default function CardContent() {
 
         <a 
           href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo" 
-          className="tracking-[1.5px] text-[#000000] break-all no-underline" 
+          className="tracking-[1.5px] text-[#000000] break-all no-underline mt-[10px]" 
         >
           https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo
         </a>
