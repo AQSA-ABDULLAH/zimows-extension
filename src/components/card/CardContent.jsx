@@ -7,7 +7,7 @@ export default function CardContent() {
         <img src="/images/card/WS Chrome Line.svg" alt="line" />
       </div>
 
-      <div className="flex flex-column font-[12px] tracking-[1px] ml-[10px] leading-none">
+      <div className="flex flex-col font-[12px] tracking-[1px] ml-[10px] leading-none">
         <div className="flex items-center gap-[43px]">
           <img src="icons/Group 34927.svg" alt="BBC" className="h-[30px]" />
           <a 
