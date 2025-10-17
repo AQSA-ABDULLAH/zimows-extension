@@ -1,19 +1,27 @@
-import React from 'react';
+import React from "react";
 
 export default function CardContent() {
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
       <div className="">
-        <img src="/images/card/WS Chrome Line.svg" alt="line" className='w-[1px] h-[195px]' />
+        <img
+          src="/images/card/WS Chrome Line.svg"
+          alt="line"
+          className="w-[1px] h-[195px]"
+        />
       </div>
 
       <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1px] ml-[10px] leading-none">
         <div className="flex items-center gap-[43px] mt-[5px]">
-          <img src="images/card/logo/amex dls-logo-bluebox-solid.svg" alt="BBC" className="h-[30px] w-[30px]" />
-          <a 
-            href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <img
+            src="images/card/logo/amex dls-logo-bluebox-solid.svg"
+            alt="BBC"
+            className="h-[30px] w-[30px]"
+          />
+          <a
+            href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             zimo.ws/OFBxVT
           </a>
@@ -23,10 +31,7 @@ export default function CardContent() {
           Deadly fighting erupts between Hamas and Palestinian clan in Gaza
         </h3>
 
-        <a 
-          href="/" 
-          className="tracking-[1.5px] break-all cursor-default" 
-        >
+        <a href="/" className="tracking-[1.5px] break-all cursor-default">
           https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo
         </a>
 
@@ -36,12 +41,23 @@ export default function CardContent() {
         </div>
 
         <div className="flex gap-[50px]">
-          <img src="/images/card/Open in New Window.svg" alt="open window" className='h-[22px] cursor-pointer' />
-          <img src="/images/card/Copy Icon B.svg" alt="copy" className='h-[22px] cursor-pointer' />
-          <img src="/images/card/Share Icon B.svg" alt="share" className='h-[22px] cursor-pointer' />
+          <img
+            src="/images/card/Open in New Window.svg"
+            alt="open window"
+            className="h-[22px] cursor-pointer"
+          />
+          <img
+            src="/images/card/Copy Icon B.svg"
+            alt="copy"
+            className="h-[22px] cursor-pointer"
+          />
+          <img
+            src="/images/card/Share Icon B.svg"
+            alt="share"
+            className="h-[22px] cursor-pointer"
+          />
         </div>
       </div>
     </div>
   );
 }
-
