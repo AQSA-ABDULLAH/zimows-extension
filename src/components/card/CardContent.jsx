@@ -8,7 +8,7 @@ export default function CardContent() {
       </div>
 
       <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1px] ml-[10px] leading-none">
-        <div className="flex items-center gap-[43px] mt-[6px]">
+        <div className="flex items-center gap-[43px] mt-[5px]">
           <img src="images/card/logo/amex dls-logo-bluebox-solid.svg" alt="BBC" className="h-[30px] w-[30px]" />
           <a 
             href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo" 
