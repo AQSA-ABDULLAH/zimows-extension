@@ -9,6 +9,7 @@ body{
     width: 510px;
     display: flex;
     align-items: center;
+    max-height: 736px;
 }
 
 /* For hide scrollbar */
@@ -22,6 +23,29 @@ body{
 
 
 /* Default Sidebar */
+/* ✨ Global Scrollbar Style for the Website */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button:single-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
 /* ✨ Ultra Thin Scrollbar for Sidebar */
 .ultra-thin-scrollbar {
   scroll-behavior: smooth;
@@ -46,3 +70,5 @@ body{
   width: 0;
   height: 0;
 }
+
+
