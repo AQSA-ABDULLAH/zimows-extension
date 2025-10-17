@@ -4,9 +4,9 @@ import HistoryList from "../card/HistoryList";
 
 function History({ setActivePage }) {
   return (
-    <div className="">
+    <div className="mt-[41px]">
       {/* Logo ko clickable banaya */}
-      <div className="fixed top-[40px] left-[11px] cursor-pointer">
+      <div className="absolute z-[20] top-[40px] left-[11px] cursor-pointer">
         <img
           src="images/header/RECENT B.svg"
           alt="Zimo Logo"
@@ -14,7 +14,7 @@ function History({ setActivePage }) {
         />
       </div>
 
-      <div className="w-full bg-white fixed flex justify-between items-center p-[40px]">
+      <div className="w-full z-[10] bg-white fixed flex justify-between items-center p-[40px]">
         <div onClick={() => setActivePage("home")}>
           <img
             src="images/header/ZIMO WS Duo Chrome B.svg"
@@ -31,7 +31,7 @@ function History({ setActivePage }) {
         </div>
       </div>
 
-      <div className="mt-[48px]">
+      <div className="">
         <HistoryList />
         <Footer />
       </div>
