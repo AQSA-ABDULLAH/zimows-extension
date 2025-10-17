@@ -1,6 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 
-function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
+function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id }) {
+  // Delete confirmation ke liye state banayein
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const handleDeleteClick = () => {
+    if (confirmDelete) {
+      // Agar pehle se confirmDelete true hai (icon red hai), to delete function call karein
+      onDelete(id);
+    } else {
+      // Pehli click par, state ko true set karein taaki icon red ho jaye
+      setConfirmDelete(true);
+    }
+  };
   return (
     <div className="flex items-center gap-[20px] ml-[10px] mb-[48px]">
       <div>
@@ -62,10 +74,16 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date }) {
             alt="share"
             className="h-[22px] cursor-pointer"
           />
-          <img
-            src="/images/card/Delete Icon B.svg"
+         <img
+            // src ko state ke hisaab se change karein
+            src={
+              confirmDelete
+                ? "/images/card/Delete Icon Red.svg" // Red icon ka path
+                : "/images/card/Delete Icon B.svg"   // Original icon ka path
+            }
             alt="delete"
             className="h-[22px] cursor-pointer"
+            onClick={handleDeleteClick} // onClick handler add karein
           />
           <img
           src="/images/card/Counter - URL Clicks.svg"

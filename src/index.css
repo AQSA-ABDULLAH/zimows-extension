@@ -9,7 +9,6 @@ body{
     width: 510px;
     display: flex;
     align-items: center;
-    max-height: 736px;
 }
 
 /* For hide scrollbar */

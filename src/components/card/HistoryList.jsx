@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import HistoryCard from "./HistoryCard";
 
-const historyData = [
+const initialHistoryData = [
   {
+    id: 1,
     icon: "images/card/logo/amex dls-logo-bluebox-solid.svg",
     shortUrl: "zimo.ws/OFBxVT",
     title: "Deadly fighting erupts between Hamas and Palestinian clan in Gaza",
@@ -11,6 +12,7 @@ const historyData = [
     date: "06 October 2025",
   },
   {
+    id: 2,
     icon: "/images/card/logo/sky-news-logo-dark.svg",
     shortUrl: "zimo.ws/OFBxUT",
     title: "Some other news title goes here",
@@ -19,6 +21,7 @@ const historyData = [
     date: "07 October 2025",
   },
   {
+    id: 3,
     icon: "/images/card/logo/bbc-log.png",
     shortUrl: "zimo.ws/OFBxYU",
     title: "Deadladjhadg Hamas and Palestinian clan in Gaza",
@@ -30,10 +33,29 @@ const historyData = [
 
 
 function HistoryList() {
+  const [historyItems, setHistoryItems] = useState(initialHistoryData);
+
+  // Yeh function card ko delete karega
+  const handleDeleteItem = (idToDelete) => {
+    // .filter() use karke us item ko hata dein jiski id match karti hai
+    const updatedItems = historyItems.filter((item) => item.id !== idToDelete);
+    setHistoryItems(updatedItems);
+    console.log(`Item with id: ${idToDelete} deleted.`);
+  };
   return (
     <div>
-      {historyData.map((item, index) => (
-        <HistoryCard key={index} {...item} />
+      {historyItems.map((item) => (
+        <HistoryCard
+          key={item.id}
+          id={item.id} // <-- id pass karein
+          icon={item.icon}
+          shortUrl={item.shortUrl}
+          title={item.title}
+          fullUrl={item.fullUrl}
+          time={item.time}
+          date={item.date}
+          onDelete={handleDeleteItem} // <-- delete function pass karein
+        />
       ))}
     </div>
   );
