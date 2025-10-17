@@ -4,34 +4,35 @@ import HistoryList from "../card/HistoryList";
 
 function History({ setActivePage }) {
   return (
-    <div className="mt-[41px]">
-      {/* Logo ko clickable banaya */}
-      <div className="absolute z-[20] top-[40px] left-[11px] cursor-pointer">
-        <img
-          src="images/header/RECENT B.svg"
-          alt="Zimo Logo"
-          className="h-[67.72px]"
-        />
-      </div>
+    <div className="relative min-h-screen">
+      
+        
+        {/* RECENT wala logo ab header ke andar hai */}
+        <div className="absolute z-[100] top-[40px] left-[11px] cursor-pointer">
+          <img
+            src="images/header/RECENT B.svg"
+            alt="Zimo Logo"
+            className="h-[67.72px]"
+          />
+        </div>
 
-      <div className="w-full z-[10] bg-white fixed flex justify-between items-center p-[40px]">
-        <div onClick={() => setActivePage("home")}>
+        {/* Aap ka baqi header ka content */}
+        <div className="w-[510px] flex justify-between items-center p-[40px] mt-[200px]">
           <img
             src="images/header/ZIMO WS Duo Chrome B.svg"
             alt="Zimo Logo"
-            className="h-[20px] "
+            className="h-[20px]"
+            onClick={() => setActivePage("home")}
           />
-        </div>
-        <div className="flex gap-[40px]">
           <img
             src="images/header/Chrome Extension Icon.svg"
             alt="Chrome Extension Icon"
             className="h-[20px]"
           />
         </div>
-      </div>
 
-      <div className="">
+      {/* Scrollable content */}
+      <div className="mt-[48px]">
         <HistoryList />
         <Footer />
       </div>

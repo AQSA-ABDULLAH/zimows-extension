@@ -23,11 +23,13 @@ export default function Share() {
     "/images/share/Telegram B.svg",
     "/images/share/Facebook B.svg",
     "/images/share/X B.svg",
-    "/images/share/youtube B.svg",
-    "/images/share/google B.svg",
-    "/images/share/ztfr B.svg",
-    "/images/share/nike B.svg",
-    "/images/share/bbc B.svg",
+
+    "/images/share/WeChat B.svg",
+    "/images/share/Threads B.svg",
+    "/images/share/Reddit B.svg",
+    "/images/share/Discord B.svg",
+    "/images/share/SinaWeibo B.svg",
+    "/images/share/BlueSky B.svg"
   ];
 
   return (
