@@ -3,7 +3,7 @@ import HistoryCard from "./HistoryCard";
 
 const historyData = [
   {
-    icon: "/images/card/logo/bbc-log.svg",
+    icon: "images/card/logo/amex dls-logo-bluebox-solid.svg",
     shortUrl: "zimo.ws/OFBxVT",
     title: "Deadly fighting erupts between Hamas and Palestinian clan in Gaza",
     fullUrl: "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo",
@@ -19,7 +19,7 @@ const historyData = [
     date: "07 October 2025",
   },
   {
-    icon: "/images/card/logo/sky-news-logo-dark.svg",
+    icon: "/images/card/logo/bbc-log.png",
     shortUrl: "zimo.ws/OFBxYU",
     title: "Deadladjhadg Hamas and Palestinian clan in Gaza",
     fullUrl: "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo",

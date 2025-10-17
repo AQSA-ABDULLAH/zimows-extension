@@ -21,7 +21,7 @@ function History({ setActivePage }) {
           <img
             src="images/header/ZIMO WS Duo Chrome B.svg"
             alt="Zimo Logo"
-            className="h-[20px]"
+            className="h-[20px] cursor-pointer"
             onClick={() => setActivePage("home")}
           />
           <img

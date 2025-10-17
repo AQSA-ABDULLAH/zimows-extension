@@ -28,8 +28,9 @@ export default function Share() {
     "/images/share/Threads B.svg",
     "/images/share/Reddit B.svg",
     "/images/share/Discord B.svg",
-    "/images/share/SinaWeibo B.svg",
-    "/images/share/BlueSky B.svg"
+    "/images/share/BlueSky B.svg",
+    "/images/share/Sina Weibo B.svg",
+    
   ];
 
   return (
@@ -55,13 +56,13 @@ export default function Share() {
         <img
           src="/images/share/Arrow Left B.svg"
           alt="Left arrow"
-          className="h-[25.52px] cursor-pointer opacity-50"
+          className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
           onClick={() => handleScroll("left")}
         />
         <img
           src="/images/share/Arrow Right B.svg"
           alt="Right arrow"
-          className="h-[25.52px] cursor-pointer opacity-50"
+          className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
           onClick={() => handleScroll("right")}
         />
       </div>
