@@ -17,7 +17,7 @@ function History({ setActivePage }) {
         </div>
 
         {/* Aap ka baqi header ka content */}
-        <div className="w-[510px] flex justify-between items-center p-[40px] mt-[200px]">
+        <div className="w-[510px] flex justify-between items-center p-[40px]">
           <img
             src="images/header/ZIMO WS Duo Chrome B.svg"
             alt="Zimo Logo"
