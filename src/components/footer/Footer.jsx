@@ -26,7 +26,7 @@ export default function Footer({ start }) {
 
       {showLinks && (
         <motion.div
-          className="flex justify-between items-center mt-[10px] text-black leading-none text-[12px] font-medium"
+          className="flex justify-between items-center mt-[15px] text-black leading-none text-[12px] font-medium"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
