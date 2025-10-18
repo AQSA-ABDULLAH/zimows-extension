@@ -21,13 +21,17 @@ function useTypingEffect(text, delay = 40, start = true) {
 
 export default function CardContent() {
   const shortUrl = "zimo.ws/OFBxVT";
-  const headingText = "Deadly fighting erupts between Hamas and Palestinian clan in Gaza";
-  const originalUrl = "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo";
+  const headingText =
+    "Deadly fighting erupts between Hamas and Palestinian clan in Gaza";
+  const originalUrl =
+    "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo";
 
   const [showLogo, setShowLogo] = useState(false);
   const [startShortUrl, setStartShortUrl] = useState(false);
   const [startHeading, setStartHeading] = useState(false);
   const [startOriginalUrl, setStartOriginalUrl] = useState(false);
+  const [showDateTime, setShowDateTime] = useState(false);
+  const [showIcons, setShowIcons] = useState([false, false, false]);
 
   const typedShortUrl = useTypingEffect(shortUrl, 50, startShortUrl);
   const typedHeading = useTypingEffect(headingText, 30, startHeading);
@@ -44,9 +48,24 @@ export default function CardContent() {
     setTimeout(() => setStartHeading(true), 1000 + shortUrl.length * 50 + 500);
 
     // Step 4: Start typing Original URL
+    const totalTypingTime =
+      1000 +
+      shortUrl.length * 50 +
+      headingText.length * 30 +
+      800;
     setTimeout(() => {
       setStartOriginalUrl(true);
-    }, 1000 + shortUrl.length * 50 + headingText.length * 30 + 800);
+    }, totalTypingTime);
+
+    // Step 5: Show Date & Time
+    setTimeout(() => {
+      setShowDateTime(true);
+    }, totalTypingTime + originalUrl.length * 25 + 500);
+
+    // Step 6: Show Icons one by one
+    setTimeout(() => setShowIcons((prev) => [true, false, false]), totalTypingTime + originalUrl.length * 25 + 900);
+    setTimeout(() => setShowIcons((prev) => [true, true, false]), totalTypingTime + originalUrl.length * 25 + 1200);
+    setTimeout(() => setShowIcons((prev) => [true, true, true]), totalTypingTime + originalUrl.length * 25 + 1500);
   }, []);
 
   return (
@@ -73,7 +92,7 @@ export default function CardContent() {
             />
           )}
           <a
-            href="https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo"
+            href={originalUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono"
@@ -82,42 +101,64 @@ export default function CardContent() {
           </a>
         </div>
 
-        {/* Heading typing */}
-        <h3 className="tracking-[1.8px] leading-[18px] ">
+        {/* 📰 Heading typing */}
+        <h3 className="tracking-[1.8px] leading-[18px]">
           {typedHeading}
         </h3>
 
-        {/* Original URL typing */}
+        {/* 🔗 Original URL typing */}
         <a
           href="/"
-          className="tracking-[1.5px] break-all cursor-default"
+          className="tracking-[1.5px] break-all cursor-default font-mono"
         >
           {typedOriginalUrl}
         </a>
 
-        {/* Time and Date */}
-        <div className="flex gap-[30px] leading-[10px]">
-          <span>17:23</span>
-          <span>06 October 2025</span>
-        </div>
+        {/* 📅 Time and Date */}
+        {showDateTime && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex gap-[30px] leading-[10px]"
+          >
+            <span>17:23</span>
+            <span>06 October 2025</span>
+          </motion.div>
+        )}
 
-        {/* Icons */}
+        {/* 🖼 Icons sequential animation */}
         <div className="flex gap-[50px]">
-          <img
-            src="/images/card/Open in New Window.svg"
-            alt="open window"
-            className="h-[22px] cursor-pointer"
-          />
-          <img
-            src="/images/card/Copy Icon B.svg"
-            alt="copy"
-            className="h-[22px] cursor-pointer"
-          />
-          <img
-            src="/images/card/Share Icon B.svg"
-            alt="share"
-            className="h-[22px] cursor-pointer"
-          />
+          {showIcons[0] && (
+            <motion.img
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              src="/images/card/Open in New Window.svg"
+              alt="open window"
+              className="h-[22px] cursor-pointer"
+            />
+          )}
+          {showIcons[1] && (
+            <motion.img
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              src="/images/card/Copy Icon B.svg"
+              alt="copy"
+              className="h-[22px] cursor-pointer"
+            />
+          )}
+          {showIcons[2] && (
+            <motion.img
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              src="/images/card/Share Icon B.svg"
+              alt="share"
+              className="h-[22px] cursor-pointer"
+            />
+          )}
         </div>
       </div>
     </div>
