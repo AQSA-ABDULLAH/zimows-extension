@@ -42,7 +42,7 @@ export default function Share({ start, onAnimationComplete }) {
       }
     }, 120);
     return () => clearInterval(interval);
-  });
+  }, [start]);
 
   const handleScroll = (direction) => {
     const scrollAmount = 300;

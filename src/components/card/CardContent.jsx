@@ -91,7 +91,7 @@ export default function CardContent({ start, onAnimationComplete }) {
   }, totalTimeForAllAnimations);
 
   return () => clearTimeout(finalTimeout);
-  });
+  }, [showLine]);
 
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
@@ -102,8 +102,8 @@ export default function CardContent({ start, onAnimationComplete }) {
             src="/images/card/WS Chrome Line.svg"
             alt="line"
             className="w-[1px] h-[195px]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
           />
         )}
@@ -149,8 +149,8 @@ export default function CardContent({ start, onAnimationComplete }) {
         {/* ⏰ Date & Time */}
         {showDateTime && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="flex gap-[30px] leading-[10px]"
           >
