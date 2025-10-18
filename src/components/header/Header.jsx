@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-function Header({ setActivePage }) {
+function Header({ setActivePage, onHeaderAnimationComplete }) {
   const [showLogo, setShowLogo] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
   const [showExtension, setShowExtension] = useState(false);
@@ -35,6 +35,7 @@ function Header({ setActivePage }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
+            onAnimationComplete={onHeaderAnimationComplete}
           />
         )}
 

@@ -1,17 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-export default function Share() {
+export default function Share({ start }) {
   const scrollRef = useRef(null);
-
-  const handleScroll = (direction) => {
-    const scrollAmount = 300; // kitna scroll karna hai per click
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: direction === "right" ? scrollAmount : -scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
+  const [visibleIcons, setVisibleIcons] = useState([]);
 
   const icons = [
     "/images/share/Share Icon B.svg",
@@ -23,15 +15,35 @@ export default function Share() {
     "/images/share/Telegram B.svg",
     "/images/share/Facebook B.svg",
     "/images/share/X B.svg",
-
     "/images/share/WeChat B.svg",
     "/images/share/Threads B.svg",
     "/images/share/Reddit B.svg",
     "/images/share/Discord B.svg",
     "/images/share/BlueSky B.svg",
     "/images/share/Sina Weibo B.svg",
-    
   ];
+
+  // 👉 One by one icon reveal after CardContent animation
+  useEffect(() => {
+    if (!start) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      setVisibleIcons(prev => [...prev, icons[i]]);
+      i++;
+      if (i >= icons.length) clearInterval(interval);
+    }, 120); // har 120ms me next icon
+    return () => clearInterval(interval);
+  }, [start]);
+
+  const handleScroll = (direction) => {
+    const scrollAmount = 300;
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: direction === "right" ? scrollAmount : -scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
     <div>
@@ -41,12 +53,15 @@ export default function Share() {
         className="flex gap-[28px] mx-[12px] mb-[28.5px] mt-[29px] overflow-x-auto scroll-smooth no-scrollbar"
         style={{ scrollBehavior: "smooth" }}
       >
-        {icons.map((icon, index) => (
-          <img
+        {visibleIcons.map((icon, index) => (
+          <motion.img
             key={index}
             src={icon}
             alt={`icon-${index}`}
             className="h-[25.52px] flex-shrink-0"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
           />
         ))}
       </div>

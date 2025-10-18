@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-// ✅ Typing effect custom hook
 function useTypingEffect(text, delay = 40, start = true) {
   const [displayedText, setDisplayedText] = useState("");
 
@@ -19,13 +18,14 @@ function useTypingEffect(text, delay = 40, start = true) {
   return displayedText;
 }
 
-export default function CardContent() {
+export default function CardContent({ start, onAnimationComplete }) {
   const shortUrl = "zimo.ws/OFBxVT";
   const headingText =
     "Deadly fighting erupts between Hamas and Palestinian clan in Gaza";
   const originalUrl =
     "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo";
 
+  const [showLine, setShowLine] = useState(false);
   const [showLogo, setShowLogo] = useState(false);
   const [startShortUrl, setStartShortUrl] = useState(false);
   const [startHeading, setStartHeading] = useState(false);
@@ -38,75 +38,107 @@ export default function CardContent() {
   const typedOriginalUrl = useTypingEffect(originalUrl, 25, startOriginalUrl);
 
   useEffect(() => {
-    // Step 1: Show Logo
+    if (!start) return;
+
+    // Step 1: Show Line first
+    setShowLine(true);
+  }, [start]);
+
+  useEffect(() => {
+    if (!showLine) return;
+
+    // Step 2: Show Logo
     setTimeout(() => setShowLogo(true), 300);
 
-    // Step 2: Start typing Short URL
+    // Step 3: Start typing Short URL
     setTimeout(() => setStartShortUrl(true), 1000);
 
-    // Step 3: Start typing Heading
+    // Step 4: Start typing Heading
     setTimeout(() => setStartHeading(true), 1000 + shortUrl.length * 50 + 500);
 
-    // Step 4: Start typing Original URL
     const totalTypingTime =
-      1000 +
-      shortUrl.length * 50 +
-      headingText.length * 30 +
-      800;
-    setTimeout(() => {
-      setStartOriginalUrl(true);
-    }, totalTypingTime);
+      1000 + shortUrl.length * 50 + headingText.length * 30 + 800;
 
-    // Step 5: Show Date & Time
-    setTimeout(() => {
-      setShowDateTime(true);
-    }, totalTypingTime + originalUrl.length * 25 + 500);
+    // Step 5: Original URL
+    setTimeout(() => setStartOriginalUrl(true), totalTypingTime);
 
-    // Step 6: Show Icons one by one
-    setTimeout(() => setShowIcons((prev) => [true, false, false]), totalTypingTime + originalUrl.length * 25 + 900);
-    setTimeout(() => setShowIcons((prev) => [true, true, false]), totalTypingTime + originalUrl.length * 25 + 1200);
-    setTimeout(() => setShowIcons((prev) => [true, true, true]), totalTypingTime + originalUrl.length * 25 + 1500);
-  }, []);
+    // Step 6: Date & Time
+    setTimeout(
+      () => setShowDateTime(true),
+      totalTypingTime + originalUrl.length * 25 + 500
+    );
+
+    // Step 7: Icons (1 by 1)
+    setTimeout(
+      () => setShowIcons([true, false, false]),
+      totalTypingTime + originalUrl.length * 25 + 900
+    );
+    setTimeout(
+      () => setShowIcons([true, true, false]),
+      totalTypingTime + originalUrl.length * 25 + 1200
+    );
+    setTimeout(
+      () => setShowIcons([true, true, true]),
+      totalTypingTime + originalUrl.length * 25 + 1500
+    );
+
+    // 🏁 Final step after last icon appears
+  const totalTimeForAllAnimations =
+    totalTypingTime + originalUrl.length * 25 + 1500 + 600;
+
+  const finalTimeout = setTimeout(() => {
+    if (onAnimationComplete) onAnimationComplete(); // callback trigger
+  }, totalTimeForAllAnimations);
+
+  return () => clearTimeout(finalTimeout);
+  }, [showLine]);
 
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
+      {/* 🟡 First Step: Line Animation */}
       <div>
-        <img
-          src="/images/card/WS Chrome Line.svg"
-          alt="line"
-          className="w-[1px] h-[195px]"
-        />
+        {showLine && (
+          <motion.img
+            src="/images/card/WS Chrome Line.svg"
+            alt="line"
+            className="w-[1px] h-[195px]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          />
+        )}
       </div>
 
       <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1px] ml-[10px] leading-none">
-        {/* ✅ Logo fade-in */}
-        <div className="flex items-center gap-[43px] mt-[5px]">
-          {showLogo && (
-            <motion.img
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              src="images/card/logo/amex dls-logo-bluebox-solid.svg"
-              alt="BBC"
-              className="h-[30px] w-[30px]"
-            />
-          )}
-          <a
-            href={originalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono"
-          >
-            {typedShortUrl}
-          </a>
+         <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
+        {/* 🪙 Logo */}
+        {showLogo && (
+          <motion.img
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            src="images/card/logo/amex dls-logo-bluebox-solid.svg"
+            alt="BBC"
+            className="h-[30px] w-[30px]"
+          />
+        )}
+
+        {/* 🔗 Short URL */}
+        <a
+          href={originalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono"
+        >
+          {typedShortUrl}
+        </a>
+
         </div>
 
-        {/* 📰 Heading typing */}
-        <h3 className="tracking-[1.8px] leading-[18px]">
-          {typedHeading}
-        </h3>
+        {/* 📰 Heading */}
+        <h3 className="tracking-[1.8px] leading-[18px]">{typedHeading}</h3>
 
-        {/* 🔗 Original URL typing */}
+        {/* 🌐 Original URL */}
         <a
           href="/"
           className="tracking-[1.5px] break-all cursor-default font-mono"
@@ -114,7 +146,7 @@ export default function CardContent() {
           {typedOriginalUrl}
         </a>
 
-        {/* 📅 Time and Date */}
+        {/* ⏰ Date & Time */}
         {showDateTime && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -127,7 +159,7 @@ export default function CardContent() {
           </motion.div>
         )}
 
-        {/* 🖼 Icons sequential animation */}
+        {/* 🖼 Icons */}
         <div className="flex gap-[50px]">
           {showIcons[0] && (
             <motion.img
