@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import HistoryCard from "./HistoryCard";
 
-const initialHistoryData = [
+function HistoryList() {
+  const [items, setItems] = useState([
   {
     id: 1,
     icon: "images/card/logo/amex dls-logo-bluebox-solid.svg",
@@ -29,34 +31,18 @@ const initialHistoryData = [
     time: "17:23",
     date: "06 October 2028",
   },
-];
+ ]);
 
-
-function HistoryList() {
-  const [historyItems, setHistoryItems] = useState(initialHistoryData);
-
-  // Yeh function card ko delete karega
-  const handleDeleteItem = (idToDelete) => {
-    // .filter() use karke us item ko hata dein jiski id match karti hai
-    const updatedItems = historyItems.filter((item) => item.id !== idToDelete);
-    setHistoryItems(updatedItems);
-    console.log(`Item with id: ${idToDelete} deleted.`);
+  const handleDelete = (id) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
   };
   return (
-    <div>
-      {historyItems.map((item) => (
-        <HistoryCard
-          key={item.id}
-          id={item.id} // <-- id pass karein
-          icon={item.icon}
-          shortUrl={item.shortUrl}
-          title={item.title}
-          fullUrl={item.fullUrl}
-          time={item.time}
-          date={item.date}
-          onDelete={handleDeleteItem} // <-- delete function pass karein
-        />
-      ))}
+     <div>
+      <AnimatePresence mode="popLayout">
+        {items.map((item) => (
+          <HistoryCard key={item.id} {...item} onDelete={handleDelete} />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

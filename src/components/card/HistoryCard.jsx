@@ -1,20 +1,33 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id }) {
-  // Delete confirmation ke liye state banayein
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleDeleteClick = () => {
     if (confirmDelete) {
-      // Agar pehle se confirmDelete true hai (icon red hai), to delete function call karein
       onDelete(id);
     } else {
-      // Pehli click par, state ko true set karein taaki icon red ho jaye
       setConfirmDelete(true);
+      // 5 sec baad confirmation auto cancel
+      setTimeout(() => setConfirmDelete(false), 5000);
     }
   };
+
   return (
-    <div className="flex items-center gap-[20px] ml-[10px] mb-[48px]">
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+      transition={{
+        opacity: { duration: 0.25 },
+        y: { type: "spring", stiffness: 300, damping: 30 },
+        scale: { duration: 0.25 },
+        layout: { type: "spring", stiffness: 200, damping: 25, duration: 0.6 },
+      }}
+      className="flex items-center gap-[20px] ml-[10px] mb-[48px]"
+    >
       <div>
         <img
           src="/images/card/WS Chrome Line.svg"
@@ -27,23 +40,17 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id 
         {/* Top Section */}
         <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
           <img src={icon} alt="Logo" className="h-[30px] w-[30px]" />
-          <a
-            href={fullUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={fullUrl} target="_blank" rel="noopener noreferrer">
             {shortUrl}
           </a>
         </div>
 
         {/* Title */}
-        <h3 className="tracking-[1.8px] leading-[18px]">
-          {title}
-        </h3>
+        <h3 className="tracking-[1.8px] leading-[18px]">{title}</h3>
 
         {/* Full Link */}
         <a
-        href="/"
+          href={fullUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="tracking-[1.5px] break-all cursor-default"
@@ -74,26 +81,28 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id 
             alt="share"
             className="h-[22px] cursor-pointer"
           />
-         <img
-            // src ko state ke hisaab se change karein
+          <img
             src={
               confirmDelete
-                ? "/images/card/Delete Icon Red.svg" // Red icon ka path
-                : "/images/card/Delete Icon B.svg"   // Original icon ka path
+                ? "/images/card/Delete Icon Red.svg"
+                : "/images/card/Delete Icon B.svg"
             }
             alt="delete"
-            className="h-[22px] cursor-pointer"
-            onClick={handleDeleteClick} // onClick handler add karein
+            className={`h-[22px] cursor-pointer transition-all duration-300 ease-in-out transform ${
+              confirmDelete ? "scale-110" : "scale-100"
+            }`}
+            onClick={handleDeleteClick}
           />
           <img
-          src="/images/card/Counter - URL Clicks.svg"
-          alt="counter click"
-          className="h-[22px] cursor-pointer"
+            src="/images/card/Counter - URL Clicks.svg"
+            alt="counter click"
+            className="h-[22px] cursor-pointer"
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default HistoryCard;
+
