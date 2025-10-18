@@ -91,7 +91,7 @@ export default function CardContent({ start, onAnimationComplete }) {
   }, totalTimeForAllAnimations);
 
   return () => clearTimeout(finalTimeout);
-  }, [showLine]);
+  });
 
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
