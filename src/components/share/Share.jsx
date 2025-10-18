@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 export default function Share({ start }) {
   const scrollRef = useRef(null);
   const [visibleIcons, setVisibleIcons] = useState([]);
+  const [showArrows, setShowArrows] = useState(false); // ✅ arrows ke liye state
 
   const icons = [
     "/images/share/Share Icon B.svg",
@@ -23,15 +24,19 @@ export default function Share({ start }) {
     "/images/share/Sina Weibo B.svg",
   ];
 
-  // 👉 One by one icon reveal after CardContent animation
+  // 👉 Icons reveal one by one
   useEffect(() => {
     if (!start) return;
     let i = 0;
     const interval = setInterval(() => {
       setVisibleIcons(prev => [...prev, icons[i]]);
       i++;
-      if (i >= icons.length) clearInterval(interval);
-    }, 120); // har 120ms me next icon
+      if (i >= icons.length) {
+        clearInterval(interval);
+        // ✅ jab last icon show ho jaye to arrows ko thoda delay se dikhaye
+        setTimeout(() => setShowArrows(true), 300);
+      }
+    }, 120);
     return () => clearInterval(interval);
   }, [start]);
 
@@ -66,23 +71,29 @@ export default function Share({ start }) {
         ))}
       </div>
 
-      {/* SCROLL ARROWS */}
-      <div className="flex justify-between items-center mb-[28px] mx-[40px]">
-        <img
-          src="/images/share/Arrow Left B.svg"
-          alt="Left arrow"
-          className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
-          onClick={() => handleScroll("left")}
-        />
-        <img
-          src="/images/share/Arrow Right B.svg"
-          alt="Right arrow"
-          className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
-          onClick={() => handleScroll("right")}
-        />
-      </div>
+      {/* SCROLL ARROWS — 👇 animate hone ke baad hi show hon */}
+      {showArrows && (
+        <motion.div
+          className="flex justify-between items-center mb-[28px] mx-[40px]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <img
+            src="/images/share/Arrow Left B.svg"
+            alt="Left arrow"
+            className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
+            onClick={() => handleScroll("left")}
+          />
+          <img
+            src="/images/share/Arrow Right B.svg"
+            alt="Right arrow"
+            className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
+            onClick={() => handleScroll("right")}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }
-
 
