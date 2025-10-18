@@ -5,6 +5,8 @@ export default function Share({ start, onAnimationComplete }) {
   const scrollRef = useRef(null);
   const [visibleIcons, setVisibleIcons] = useState([]);
   const [showArrows, setShowArrows] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const icons = [
     "/images/share/Share Icon B.svg",
@@ -24,6 +26,7 @@ export default function Share({ start, onAnimationComplete }) {
     "/images/share/Sina Weibo B.svg",
   ];
 
+  // Animate icons one by one
   useEffect(() => {
     if (!start) return;
     let i = 0;
@@ -34,7 +37,6 @@ export default function Share({ start, onAnimationComplete }) {
         clearInterval(interval);
         setTimeout(() => {
           setShowArrows(true);
-          // 👇 jab arrows bhi show ho jaye to footer trigger karein
           setTimeout(() => {
             if (onAnimationComplete) onAnimationComplete();
           }, 500);
@@ -43,6 +45,23 @@ export default function Share({ start, onAnimationComplete }) {
     }, 120);
     return () => clearInterval(interval);
   }, [start]);
+
+  // 🔸 Check scroll position
+  const updateScrollButtons = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  };
+
+  // 🔸 Attach scroll listener
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateScrollButtons();
+    el.addEventListener("scroll", updateScrollButtons);
+    return () => el.removeEventListener("scroll", updateScrollButtons);
+  }, [visibleIcons]);
 
   const handleScroll = (direction) => {
     const scrollAmount = 300;
@@ -79,24 +98,27 @@ export default function Share({ start, onAnimationComplete }) {
         <motion.div
           className="flex justify-between items-center mb-[28px] mx-[40px]"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1}}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
           <img
             src="/images/share/Arrow Left B.svg"
             alt="Left arrow"
-            className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
-            onClick={() => handleScroll("left")}
+            className={`h-[25.52px] cursor-pointer transition-opacity ${
+              canScrollLeft ? "opacity-50 hover:opacity-100" : "opacity-30"
+            }`}
+            onClick={() => canScrollLeft && handleScroll("left")}
           />
           <img
             src="/images/share/Arrow Right B.svg"
             alt="Right arrow"
-            className="h-[25.52px] cursor-pointer opacity-50 hover:opacity-100"
-            onClick={() => handleScroll("right")}
+            className={`h-[25.52px] cursor-pointer transition-opacity ${
+              canScrollRight ? "opacity-50 hover:opacity-100" : "opacity-30"
+            }`}
+            onClick={() => canScrollRight && handleScroll("right")}
           />
         </motion.div>
       )}
     </div>
   );
 }
-
