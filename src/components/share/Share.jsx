@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export default function Share({ start }) {
+export default function Share({ start, onAnimationComplete }) {
   const scrollRef = useRef(null);
   const [visibleIcons, setVisibleIcons] = useState([]);
-  const [showArrows, setShowArrows] = useState(false); // ✅ arrows ke liye state
+  const [showArrows, setShowArrows] = useState(false);
 
   const icons = [
     "/images/share/Share Icon B.svg",
@@ -24,7 +24,6 @@ export default function Share({ start }) {
     "/images/share/Sina Weibo B.svg",
   ];
 
-  // 👉 Icons reveal one by one
   useEffect(() => {
     if (!start) return;
     let i = 0;
@@ -33,8 +32,13 @@ export default function Share({ start }) {
       i++;
       if (i >= icons.length) {
         clearInterval(interval);
-        // ✅ jab last icon show ho jaye to arrows ko thoda delay se dikhaye
-        setTimeout(() => setShowArrows(true), 300);
+        setTimeout(() => {
+          setShowArrows(true);
+          // 👇 jab arrows bhi show ho jaye to footer trigger karein
+          setTimeout(() => {
+            if (onAnimationComplete) onAnimationComplete();
+          }, 500);
+        }, 300);
       }
     }, 120);
     return () => clearInterval(interval);
@@ -56,7 +60,6 @@ export default function Share({ start }) {
       <div
         ref={scrollRef}
         className="flex gap-[28px] mx-[12px] mb-[28.5px] mt-[29px] overflow-x-auto scroll-smooth no-scrollbar"
-        style={{ scrollBehavior: "smooth" }}
       >
         {visibleIcons.map((icon, index) => (
           <motion.img
@@ -71,12 +74,12 @@ export default function Share({ start }) {
         ))}
       </div>
 
-      {/* SCROLL ARROWS — 👇 animate hone ke baad hi show hon */}
+      {/* SCROLL ARROWS */}
       {showArrows && (
         <motion.div
           className="flex justify-between items-center mb-[28px] mx-[40px]"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1}}
           transition={{ duration: 0.4 }}
         >
           <img

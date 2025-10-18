@@ -1,13 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-export default function Footer() {
+export default function Footer({ start }) {
+  const [showCopyright, setShowCopyright] = useState(false);
+  const [showLinks, setShowLinks] = useState(false);
+
+  useEffect(() => {
+    if (start) {
+      setTimeout(() => setShowCopyright(true), 200);
+      setTimeout(() => setShowLinks(true), 800); // copyright ke baad
+    }
+  }, [start]);
+
   return (
-    <div>
-      <footer className="text-[9px] mx-[20px] mb-[21.5px] uppercase tracking-[1.6px] leading-none">
-        <div>
+    <footer className="text-[9px] mx-[20px] mb-[21.5px] uppercase tracking-[1.6px] leading-none">
+      {showCopyright && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
           © COPYRIGHT 2025 WS | ZIMO GROUP LIMITED. ALL RIGHTS RESERVED.
-        </div>
-        <div class="flex justify-between items-center mt-[10px] text-black leading-none text-[12px] font-medium">
+        </motion.div>
+      )}
+
+      {showLinks && (
+        <motion.div
+          className="flex justify-between items-center mt-[10px] text-black leading-none text-[12px] font-medium"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           <p>
             <a
               href="https://zimo.ws/legal/tpce"
@@ -18,7 +41,7 @@ export default function Footer() {
               TERMS | PRIVACY
             </a>
           </p>
-          <div class="flex gap-[10px]">
+          <div className="flex gap-[10px]">
             <img
               src="/images/footer/ZIMO WS.svg"
               alt="Zimo Logo"
@@ -30,8 +53,8 @@ export default function Footer() {
               className="h-[10px]"
             />
           </div>
-        </div>
-      </footer>
-    </div>
+        </motion.div>
+      )}
+    </footer>
   );
 }
