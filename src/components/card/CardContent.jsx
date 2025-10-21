@@ -1,3 +1,4 @@
+/* global chrome */
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
@@ -22,8 +23,21 @@ export default function CardContent({ start, onAnimationComplete }) {
   const shortUrl = "zimo.ws/OFBxVT";
   const headingText =
     "Deadly fighting erupts between Hamas and Palestinian clan in Gaza";
-  const originalUrl =
-    "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo";
+  const [originalUrl, setOriginalUrl] = useState("");
+
+  // 🧠 Detect current tab URL
+  useEffect(() => {
+    if (window.chrome?.tabs) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.url) {
+          setOriginalUrl(tabs[0].url);
+        }
+      });
+    } else {
+      // fallback for local testing
+      setOriginalUrl("https://example.com/this-is-a-longer-fallback-url-for-testing-animation-timing");
+    }
+  }, []);
 
   const [showLine, setShowLine] = useState(false);
   const [showLogo, setShowLogo] = useState(false);
@@ -39,59 +53,104 @@ export default function CardContent({ start, onAnimationComplete }) {
 
   useEffect(() => {
     if (!start) return;
-
     // Step 1: Show Line first
     setShowLine(true);
   }, [start]);
 
+  // ✅ FIXED: Effect 1 (Steps 2-5)
+  // This effect schedules the first part of the animation,
+  // up to *starting* the original URL.
   useEffect(() => {
     if (!showLine) return;
 
     // Step 2: Show Logo
-    setTimeout(() => setShowLogo(true), 300);
+    const logoTimeout = setTimeout(() => setShowLogo(true), 300);
 
     // Step 3: Start typing Short URL
-    setTimeout(() => setStartShortUrl(true), 1000);
+    const shortUrlTimeout = setTimeout(() => setStartShortUrl(true), 1000);
 
     // Step 4: Start typing Heading
-    setTimeout(() => setStartHeading(true), 1000 + shortUrl.length * 50 + 500);
-
-    const totalTypingTime =
-      1000 + shortUrl.length * 50 + headingText.length * 30 + 800;
+    const headingDelay = 1000 + shortUrl.length * 50 + 500;
+    const headingTimeout = setTimeout(() => setStartHeading(true), headingDelay);
 
     // Step 5: Original URL
-    setTimeout(() => setStartOriginalUrl(true), totalTypingTime);
+    // Calculate total time *before* starting the original URL
+    const totalTypingTime =
+      1000 + shortUrl.length * 50 + headingText.length * 30 + 800;
+    const originalUrlTimeout = setTimeout(
+      () => setStartOriginalUrl(true),
+      totalTypingTime
+    );
+
+    // Cleanup for this part of the animation
+    return () => {
+      clearTimeout(logoTimeout);
+      clearTimeout(shortUrlTimeout);
+      clearTimeout(headingTimeout);
+      clearTimeout(originalUrlTimeout);
+    };
+  }, [showLine, shortUrl.length, headingText.length]); // Added constants to dependency array
+
+  // ✅ FIXED: Effect 2 (Steps 6-End)
+  // This effect *waits* for two things:
+  // 1. The signal to start (`startOriginalUrl = true`)
+  // 2. The URL to be fetched (`originalUrl !== ""`)
+  useEffect(() => {
+    // Wait until we have the URL *and* it's time to start typing it.
+    if (!startOriginalUrl || originalUrl === "") {
+      return;
+    }
+
+    // Now `originalUrl.length` is accurate!
+    const originalUrlTypingDuration = originalUrl.length * 25;
+
+    // Create an array to hold all timeouts for easy cleanup
+    const timeouts = [];
 
     // Step 6: Date & Time
-    setTimeout(
-      () => setShowDateTime(true),
-      totalTypingTime + originalUrl.length * 25 + 500
+    timeouts.push(
+      setTimeout(
+        () => setShowDateTime(true),
+        originalUrlTypingDuration + 500
+      )
     );
 
     // Step 7: Icons (1 by 1)
-    setTimeout(
-      () => setShowIcons([true, false, false]),
-      totalTypingTime + originalUrl.length * 25 + 900
+    timeouts.push(
+      setTimeout(
+        () => setShowIcons([true, false, false]),
+        originalUrlTypingDuration + 900
+      )
     );
-    setTimeout(
-      () => setShowIcons([true, true, false]),
-      totalTypingTime + originalUrl.length * 25 + 1200
+    timeouts.push(
+      setTimeout(
+        () => setShowIcons([true, true, false]),
+        originalUrlTypingDuration + 1200
+      )
     );
-    setTimeout(
-      () => setShowIcons([true, true, true]),
-      totalTypingTime + originalUrl.length * 25 + 1500
+    timeouts.push(
+      setTimeout(
+        () => setShowIcons([true, true, true]),
+        originalUrlTypingDuration + 1500
+      )
     );
 
     // 🏁 Final step after last icon appears
-  const totalTimeForAllAnimations =
-    totalTypingTime + originalUrl.length * 25 + 1500 + 600;
+    const totalTimeForAllAnimations =
+      originalUrlTypingDuration + 1500 + 600;
 
-  const finalTimeout = setTimeout(() => {
-    if (onAnimationComplete) onAnimationComplete(); // callback trigger
-  }, totalTimeForAllAnimations);
+    timeouts.push(
+      setTimeout(() => {
+        if (onAnimationComplete) onAnimationComplete(); // callback trigger
+      }, totalTimeForAllAnimations)
+    );
 
-  return () => clearTimeout(finalTimeout);
-  }, [showLine]);
+    // Cleanup: Clear all timeouts scheduled by *this* effect
+    return () => {
+      timeouts.forEach(clearTimeout);
+    };
+    // This effect depends on the start signal, the URL data, and the callback
+  }, [startOriginalUrl, originalUrl, onAnimationComplete]);
 
   return (
     <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
@@ -110,40 +169,35 @@ export default function CardContent({ start, onAnimationComplete }) {
       </div>
 
       <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline font-arial text-[#000] tracking-[1.2px] ml-[10px] leading-none">
-         <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
-        {/* 🪙 Logo */}
-        {showLogo && (
-          <motion.img
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            src="images/card/logo/amex dls-logo-bluebox-solid.svg"
-            alt="BBC"
-            className="h-[30px] w-[30px]"
-          />
-        )}
+        <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
+          {/* 🪙 Logo */}
+          {showLogo && (
+            <motion.img
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              src="images/card/logo/amex dls-logo-bluebox-solid.svg"
+              alt="BBC"
+              className="h-[30px] w-[30px]"
+            />
+          )}
 
-        {/* Short URL */}
-        <a
-          href={originalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[14px]"
-        >
-          {typedShortUrl}
-        </a>
-
+          {/* Short URL */}
+          <a
+            href={originalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[14px]"
+          >
+            {typedShortUrl}
+          </a>
         </div>
 
         {/* Heading */}
         <h3 className="tracking-[1.5px] leading-[18px]">{typedHeading}</h3>
 
         {/* Original URL */}
-        <p
-          className="break-all cursor-default"
-        >
-          {typedOriginalUrl}
-        </p>
+        <p className="break-all cursor-default">{typedOriginalUrl}</p>
 
         {/* Date & Time */}
         {showDateTime && (
