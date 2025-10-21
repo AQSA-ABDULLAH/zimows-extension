@@ -7,26 +7,17 @@ export default function Footer({ start }) {
 
   useEffect(() => {
     if (start) {
-      setTimeout(() => setShowCopyright(true), 200);
-      setTimeout(() => setShowLinks(true), 800); // copyright ke baad
+      setTimeout(() => setShowCopyright(true), 800);
+      setTimeout(() => setShowLinks(true), 200); // copyright ke baad
     }
   }, [start]);
 
   return (
     <footer className="text-[9px] mx-[20px] mb-[21.5px] uppercase tracking-[1.6px] leading-none">
-      {showCopyright && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
-        >
-          © COPYRIGHT 2025 WS | ZIMO GROUP LIMITED. ALL RIGHTS RESERVED.
-        </motion.div>
-      )}
 
       {showLinks && (
         <motion.div
-          className="flex justify-between items-center mt-[15px] text-black leading-none text-[12px] font-medium"
+          className="flex justify-between items-center text-black leading-none text-[12px] font-medium"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
@@ -53,6 +44,17 @@ export default function Footer({ start }) {
               className="h-[10px]"
             />
           </div>
+        </motion.div>
+      )}
+
+            {showCopyright && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="mt-[15px]"
+        >
+          © COPYRIGHT 2025 WS | ZIMO GROUP LIMITED. ALL RIGHTS RESERVED.
         </motion.div>
       )}
     </footer>

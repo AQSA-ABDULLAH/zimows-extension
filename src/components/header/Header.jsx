@@ -8,22 +8,22 @@ function Header({ setActivePage, onHeaderAnimationComplete }) {
 
   return (
     <div className="w-full flex justify-between items-center p-[40px]">
-      {/* ✅ Logo */}
+      {/* Logo */}
       <div>
         {showLogo && (
           <motion.img
             src="images/header/ZIMO WS Duo Chrome B.svg"
             alt="Zimo Logo"
             className="h-[20px]"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1}}
             transition={{ duration: 0.6 }}
              onAnimationComplete={() => setShowExtension(true)}
           />
         )}
       </div>
 
-      {/* ✅ Icons */}
+      {/* Icons */}
       <div className="flex gap-[40px]">
         {showHistory && (
           <motion.img
@@ -32,8 +32,8 @@ function Header({ setActivePage, onHeaderAnimationComplete }) {
             id="history-btn"
             className="h-[20px] cursor-pointer"
             onClick={() => setActivePage("history")}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
             onAnimationComplete={onHeaderAnimationComplete}
           />
@@ -44,8 +44,8 @@ function Header({ setActivePage, onHeaderAnimationComplete }) {
             src="images/header/Chrome Extension Icon.svg"
             alt="Chrome Extension Icon"
             className="h-[20px]"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
              onAnimationComplete={() => setShowHistory(true)}
           />

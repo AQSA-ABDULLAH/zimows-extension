@@ -20,33 +20,35 @@ export default function Share({ start, onAnimationComplete }) {
     "/images/share/X B.svg",
     "/images/share/WeChat B.svg",
     "/images/share/Threads B.svg",
+    "/images/share/BlueSky B.svg",
     "/images/share/Reddit B.svg",
     "/images/share/Discord B.svg",
-    "/images/share/BlueSky B.svg",
     "/images/share/Sina Weibo B.svg",
+    "/images/share/Messenger B.svg"
   ];
 
-  // Animate icons one by one
+  // Animate icons one by one (Yeh bilkul theek hai)
   useEffect(() => {
     if (!start) return;
     let i = 0;
+    setVisibleIcons([]);
     const interval = setInterval(() => {
-      setVisibleIcons(prev => [...prev, icons[i]]);
+      setVisibleIcons((prev) => [...prev, icons[i]]);
       i++;
       if (i >= icons.length) {
         clearInterval(interval);
         setTimeout(() => {
-          setShowArrows(true);
+          setShowArrows(true); // YEH NAYE useEffect KO TRIGGER KAREGA
           setTimeout(() => {
             if (onAnimationComplete) onAnimationComplete();
           }, 500);
-        }, 300);
+        }, 800);
       }
     }, 120);
     return () => clearInterval(interval);
   }, [start]);
 
-  // 🔸 Check scroll position
+  // 🔸 Check scroll position (Yeh function bilkul theek hai)
   const updateScrollButtons = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -54,17 +56,42 @@ export default function Share({ start, onAnimationComplete }) {
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
   };
 
-  // 🔸 Attach scroll listener
+  // --- YAHAN CHANGES KIYE GAYE HAIN ---
+
+  // 🔸 NAYA BLOCK 1: Sirf listeners attach karein (jab component load ho)
+  // Yeh state update nahi karta, is liye animation ko disturb nahi karta.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    updateScrollButtons();
+
+    // Jab user scroll kare tab update karein
     el.addEventListener("scroll", updateScrollButtons);
-    return () => el.removeEventListener("scroll", updateScrollButtons);
-  }, [visibleIcons]);
+    // Jab window resize ho tab bhi update karein
+    window.addEventListener("resize", updateScrollButtons);
+
+    // Cleanup function
+    return () => {
+      el.removeEventListener("scroll", updateScrollButtons);
+      window.removeEventListener("resize", updateScrollButtons);
+    };
+  }, []); // Empty array ka matlab: Sirf ek dafa component load honay par chalega
+
+  // 🔸 NAYA BLOCK 2: Scroll state ko check karein jab animation complete ho
+  // Yeh sirf tab chalega jab 'showArrows' true hoga.
+  useEffect(() => {
+    if (showArrows) {
+      // Ek chota sa delay (100ms) taake DOM ko update honay ka time mil jaaye
+      const timer = setTimeout(() => {
+        updateScrollButtons();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showArrows]);
+
+  // --- CHANGES END ---
 
   const handleScroll = (direction) => {
-    const scrollAmount = 300;
+    const scrollAmount = 400;
     if (scrollRef.current) {
       scrollRef.current.scrollBy({
         left: direction === "right" ? scrollAmount : -scrollAmount,
@@ -82,12 +109,12 @@ export default function Share({ start, onAnimationComplete }) {
       >
         {visibleIcons.map((icon, index) => (
           <motion.img
-            key={index}
+            key={icon} // 'key={icon}' bilkul theek hai
             src={icon}
             alt={`icon-${index}`}
-            className="h-[25.52px] flex-shrink-0"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            className="h-[25.52px] flex-shrink-0 cursor-pointer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           />
         ))}
@@ -105,7 +132,7 @@ export default function Share({ start, onAnimationComplete }) {
             src="/images/share/Arrow Left B.svg"
             alt="Left arrow"
             className={`h-[25.52px] cursor-pointer transition-opacity ${
-              canScrollLeft ? "opacity-50 hover:opacity-100" : "opacity-30"
+              canScrollLeft ? "opacity-50 hover:opacity-100" : "opacity-0"
             }`}
             onClick={() => canScrollLeft && handleScroll("left")}
           />
@@ -113,7 +140,7 @@ export default function Share({ start, onAnimationComplete }) {
             src="/images/share/Arrow Right B.svg"
             alt="Right arrow"
             className={`h-[25.52px] cursor-pointer transition-opacity ${
-              canScrollRight ? "opacity-50 hover:opacity-100" : "opacity-30"
+              canScrollRight ? "opacity-50 hover:opacity-100" : "opacity-0"
             }`}
             onClick={() => canScrollRight && handleScroll("right")}
           />

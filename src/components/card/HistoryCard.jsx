@@ -36,30 +36,27 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id 
         />
       </div>
 
-      <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1px] ml-[10px] leading-none">
+      <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1.2px] ml-[10px] leading-none">
         {/* Top Section */}
         <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
           <img src={icon} alt="Logo" className="h-[30px] w-[30px]" />
-          <a href={fullUrl} target="_blank" rel="noopener noreferrer">
+          <a href={fullUrl} target="_blank" rel="noopener noreferrer" className="text-[14px]">
             {shortUrl}
           </a>
         </div>
 
         {/* Title */}
-        <h3 className="tracking-[1.8px] leading-[18px]">{title}</h3>
+        <h3 className="tracking-[1.5px] leading-[18px]">{title}</h3>
 
         {/* Full Link */}
-        <a
-          href={fullUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="tracking-[1.5px] break-all cursor-default"
+        <p
+          className="break-all"
         >
           {fullUrl}
-        </a>
+        </p>
 
         {/* Date & Time */}
-        <div className="flex gap-[30px] leading-[10px]">
+        <div className="flex gap-[30px]">
           <span>{time}</span>
           <span>{date}</span>
         </div>
