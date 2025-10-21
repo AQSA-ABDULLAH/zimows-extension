@@ -49,7 +49,11 @@ export default function CardContent({ start, onAnimationComplete }) {
 
   const typedShortUrl = useTypingEffect(shortUrl, 50, startShortUrl);
   const typedHeading = useTypingEffect(headingText, 30, startHeading);
-  const typedOriginalUrl = useTypingEffect(originalUrl, 25, startOriginalUrl);
+  const displayUrl =
+    originalUrl.length > 60
+      ? originalUrl.slice(0, 60) + "..."
+      : originalUrl;
+const typedOriginalUrl = useTypingEffect(displayUrl, 25, startOriginalUrl);
 
   useEffect(() => {
     if (!start) return;
@@ -101,8 +105,13 @@ export default function CardContent({ start, onAnimationComplete }) {
       return;
     }
 
+    const displayUrl =
+      originalUrl.length > 60
+        ? originalUrl.slice(0, 60) + "..."
+        : originalUrl;
+
     // Now `originalUrl.length` is accurate!
-    const originalUrlTypingDuration = originalUrl.length * 25;
+    const originalUrlTypingDuration = displayUrl.length * 25;
 
     // Create an array to hold all timeouts for easy cleanup
     const timeouts = [];
@@ -197,7 +206,9 @@ export default function CardContent({ start, onAnimationComplete }) {
         <h3 className="tracking-[1.5px] leading-[18px]">{typedHeading}</h3>
 
         {/* Original URL */}
-        <p className="break-all cursor-default">{typedOriginalUrl}</p>
+        <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis">
+      {typedOriginalUrl}
+    </p>
 
         {/* Date & Time */}
         {showDateTime && (
