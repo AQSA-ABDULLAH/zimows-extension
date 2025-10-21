@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id }) {
+function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id, clickCounter }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleDeleteClick = () => {
@@ -90,11 +90,14 @@ function HistoryCard({ icon, shortUrl, title, fullUrl, time, date, onDelete, id 
             }`}
             onClick={handleDeleteClick}
           />
-          <img
+          <div className="flex gap-[5px]">
+             <img
             src="/images/card/Counter - URL Clicks.svg"
             alt="counter click"
             className="h-[22px] cursor-pointer"
           />
+            <p>{clickCounter}</p>
+          </div>
         </div>
       </div>
     </motion.div>

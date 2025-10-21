@@ -12,6 +12,7 @@ function HistoryList() {
     fullUrl: "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo",
     time: "17:23",
     date: "06 October 2025",
+    clickCounter: "20"
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ function HistoryList() {
     fullUrl: "https://www.bbc.co.uk/news/articles/example",
     time: "12:45",
     date: "07 October 2025",
+    clickCounter: "20"
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ function HistoryList() {
     fullUrl: "https://www.bbc.co.uk/news/articles/c8jm2xlk1gdo",
     time: "17:23",
     date: "06 October 2028",
+    clickCounter: "20"
   },
  ]);
 
