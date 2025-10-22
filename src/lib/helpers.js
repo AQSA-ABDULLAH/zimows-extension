@@ -4,19 +4,6 @@ import { request_lamda1, request_lamda2, request_lamda3, request_lamda4 } from "
 import { CUSTOM_DESC_API } from "./constants";
 
 
-// Formating numbers for countdown on Holding Screen
-export function formatNumber2Digit(num) {
-  num = Number(num);
-  // Check if the number is a single digit (0-9)
-  if (num >= 0 && num <= 9) {
-    // Prefix with '0' and convert back to string
-    return "0" + num.toString();
-  } else {
-    // Otherwise, return the number as a string
-    return num.toString();
-  }
-}
-
 // Conditional logging helper
 const log = (...args) => {
   if (process.env.NODE_ENV === 'development') {
@@ -30,95 +17,6 @@ const logError = (...args) => {
   }
 };
 
-/**
- * Detect if the request is from a social media crawler or bot
- * @param {string} userAgent - The user agent string from the request
- * @returns {boolean} - True if it's a crawler/bot
- */
-const isSocialMediaCrawler = (userAgent) => {
-  if (!userAgent) return false;
-  
-  const userAgentLower = userAgent.toLowerCase();
-  
-  const crawlerPatterns = [
-    // Social Media Crawlers
-    'facebookexternalhit',
-    'twitterbot',
-    'whatsapp',
-    'telegrambot',
-    'linkedinbot',
-    'slackbot',
-    'discordbot',
-    'skypeuripreview',
-    'slack-imgproxy',
-    'pinterest',
-    'tiktok',
-    'snapchat',
-    'instagram',
-    'facebook',
-    'twitter',
-    'telegram',
-    'linkedin',
-    'slack',
-    'discord',
-    'skype',
-    
-    // Search Engine Crawlers
-    'googlebot',
-    'bingbot',
-    'slurp',
-    'duckduckbot',
-    'baiduspider',
-    'yandexbot',
-    'google',
-    'bing',
-    'yahoo',
-    
-    // Other Common Bots
-    'curl',
-    'wget',
-    'python-requests',
-    'axios',
-    'postmanruntime',
-    'insomnia',
-    'httpie',
-    'bot',
-    'crawler',
-    'spider',
-    'scraper',
-    'preview',
-    'linkpreview',
-    'unfurler',
-    'metascraper'
-  ];
-  
-  const isCrawler = crawlerPatterns.some(pattern => 
-    userAgentLower.includes(pattern)
-  );
-  
-  // Additional checks for mobile app patterns
-  // const isMobileApp = userAgentLower.includes('mobile') && 
-  //                     (userAgentLower.includes('app') || 
-  //                      userAgentLower.includes('android') || 
-  //                      userAgentLower.includes('iphone'));
-  
-  // Check for common link preview patterns
-  const isLinkPreview = userAgentLower.includes('preview') || 
-                        userAgentLower.includes('unfurl') ||
-                        userAgentLower.includes('meta') ||
-                        userAgentLower.includes('og:');
-  
-  // Debug logging for WhatsApp specifically
-  if (userAgentLower.includes('whatsapp') || userAgentLower.includes('wa') || 
-      userAgentLower.includes('mobile') || isLinkPreview) {
-    console.log('🔍 Suspicious User Agent detected:', userAgent);
-    console.log('🤖 Is crawler:', isCrawler);
-    // console.log('📱 Is mobile app:', isMobileApp);
-    console.log('🔗 Is link preview:', isLinkPreview);
-  }
-  
-  return isCrawler || isLinkPreview; // || isMobileApp 
-};
 
 // @returns {latitude, longitude} - Non-blocking with timeout
 const getUserLocation = () => {
@@ -179,40 +77,6 @@ const getVisitor = async (lat = null, lng = null) => {
   }
 };
 
-// advertisements
-const getBGData = async (countryName, page) => {
-  try {
-      const { data } = await request_lamda2.get(
-        `/api/advert-by-user-country?theme=&country_name=&page=${page}`,
-      );
-    return data;
-  } catch (e) {
-    console.log("error while fetching data", e.message);
-    throw e;
-  }
-};
-
-// record adverts view
-const advertView = async (view) => {
-  try {
-    const { data } = await request_lamda1.post("/api/advert-view", view);
-    return data;
-  } catch (e) {
-    console.log("error while fetching data", e.message);
-    throw e;
-  }
-};
-
-// countries list object
-const getCountries = async () => {
-  try {
-    const { data } = request_lamda1.get("/api/get-countries");
-    return data;
-  } catch (e) {
-    logError("error while fetching countries", e.message);
-    throw e;
-  }
-};
 
 /**
  * Fetches metadata (title, description, favicon, etc.) from the backend API for a given URL.
@@ -223,7 +87,7 @@ const getMetadata = async (longUrl) => {
   try {
     console.log('🔍 Fetching metadata for:', longUrl);
     
-    // 0) Database search first (highest priority) - Check if record exists in our DB
+    // 0) Database search first (highest priority)
     let dbMetadata = null;
     try {
       if (CUSTOM_DESC_API && typeof CUSTOM_DESC_API === 'string' && CUSTOM_DESC_API.trim().length > 0) {
@@ -242,49 +106,32 @@ const getMetadata = async (longUrl) => {
         console.log('📋 Database search response data:', searchData);
         
         if (searchRes.ok && searchData && !searchData.error) {
-          // Check if we found a record in the database
           let record = null;
-          
-          // Case 1: Response has data array
+
           if (searchData.data && Array.isArray(searchData.data) && searchData.data.length > 0) {
             record = searchData.data[0];
-          }
-          // Case 2: Response has direct record object
-          else if (searchData.data && typeof searchData.data === 'object' && !Array.isArray(searchData.data)) {
+          } else if (searchData.data && typeof searchData.data === 'object' && !Array.isArray(searchData.data)) {
             record = searchData.data;
-          }
-          // Case 3: Response is the record itself
-          else if (searchData && typeof searchData === 'object' && !searchData.error && !searchData.data) {
+          } else if (searchData && typeof searchData === 'object' && !searchData.error && !searchData.data) {
             record = searchData;
           }
           
           if (record) {
             console.log('✅ Found existing record in database:', record);
             
-            // Console log media file from search API
-            if (record.media_url) {
-              console.log('🎬 Media file from search API:', record.media_url);
-            } else {
-              console.log('⚠️ Media URL is empty in search API response');
-            }
-            
-            // Prioritize media_url over image fields
-            let mediaUrl = '';
-            if (record.media_url && record.media_url.trim() !== '') {
-              mediaUrl = record.media_url;
-              console.log('🎬 Using media_url from database:', mediaUrl);
-            } else {
-              // Fallback to image fields if no media_url
-              mediaUrl = record.meta_image || record.on_image || record.og_image || record.image || '';
-              console.log('🖼️ Using image fields from database (media_url was empty):', mediaUrl);
-            }
-            
-            // Return the database record metadata
             return {
-              faviconUrl: record.favicon_url || record.favicon || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(longUrl).hostname}`,
-              metaTitle: record.meta_title || record.title || `${new URL(longUrl).hostname} - Page`,
-              metaDescription: record.meta_description || record.description || `Visit ${new URL(longUrl).hostname} for more information.`,
-              onImage: mediaUrl
+              faviconUrl:
+                record.favicon_url ||
+                record.favicon ||
+                `https://www.google.com/s2/favicons?sz=64&domain=${new URL(longUrl).hostname}`,
+              metaTitle:
+                record.meta_title ||
+                record.title ||
+                `${new URL(longUrl).hostname} - Page`,
+              metaDescription:
+                record.meta_description ||
+                record.description ||
+                `Visit ${new URL(longUrl).hostname} for more information.`,
             };
           } else {
             console.log('ℹ️ No existing record found in database, proceeding with metadata extraction');
@@ -302,7 +149,7 @@ const getMetadata = async (longUrl) => {
       console.log('⚠️ Database search error, proceeding with metadata extraction');
     }
 
-    // 1) Custom description override (fallback if no DB record found)
+    // 1) Custom description override
     let customDescription = "";
     try {
       if (CUSTOM_DESC_API && typeof CUSTOM_DESC_API === 'string' && CUSTOM_DESC_API.trim().length > 0) {
@@ -313,39 +160,35 @@ const getMetadata = async (longUrl) => {
           headers: { 'api-key': '2@w6g!!5' },
           timeout: 5000,
         });
-        {
-          // Parse JSON even if status is non-2xx; backend may still return useful fields
-          let descData = null;
-          try { descData = await descRes.json(); } catch {}
+        let descData = null;
+        try { descData = await descRes.json(); } catch {}
 
-          let candidateDesc =
-            descData?.data?.meta_description ||
-            descData?.meta_description ||
-            descData?.description ||
+        let candidateDesc =
+          descData?.data?.meta_description ||
+          descData?.meta_description ||
+          descData?.description ||
+          "";
+
+        if (!candidateDesc || candidateDesc.trim().length === 0) {
+          const candidateTitle =
+            descData?.data?.meta_title ||
+            descData?.meta_title ||
+            descData?.title ||
             "";
-
-          // If no description found, fall back to title fields as description
-          if (!candidateDesc || candidateDesc.trim().length === 0) {
-            const candidateTitle =
-              descData?.data?.meta_title ||
-              descData?.meta_title ||
-              descData?.title ||
-              "";
-            if (typeof candidateTitle === 'string' && candidateTitle.trim().length > 0) {
-              candidateDesc = candidateTitle;
-            }
+          if (typeof candidateTitle === 'string' && candidateTitle.trim().length > 0) {
+            candidateDesc = candidateTitle;
           }
+        }
 
-          if (typeof candidateDesc === 'string' && candidateDesc.trim().length > 0) {
-            customDescription = candidateDesc;
-          }
+        if (typeof candidateDesc === 'string' && candidateDesc.trim().length > 0) {
+          customDescription = candidateDesc;
         }
       }
     } catch (e) {
       logError('Custom description API failed:', e.message);
     }
 
-    // Use the new Lambda API for metadata extraction
+    // 2) Use Lambda API for metadata extraction
     const lambdaUrl = 'https://w4eoer7wo5butpzqjysfqmfcby0bbvjo.lambda-url.eu-west-2.on.aws';
     
     const response = await fetch(lambdaUrl, {
@@ -353,9 +196,7 @@ const getMetadata = async (longUrl) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        url: longUrl
-      }),
+      body: JSON.stringify({ url: longUrl }),
       timeout: 10000
     });
 
@@ -369,78 +210,32 @@ const getMetadata = async (longUrl) => {
     const domain = new URL(longUrl).hostname;
     const fallbackFavicon = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
 
-    // Extract title from Lambda API response
     const title = data.title || data.metaTitle || `${domain} - Page`;
-    
-    // Extract description with priority: custom > lambda
-    const description = customDescription || data.description || data.metaDescription || `Visit ${domain} for more information and content.`;
-    
-    // Extract image from Lambda API response
-    let image = '';
-    
-    // Priority order for image selection
-    if (data.thumbnails && data.thumbnails.medium) {
-      image = data.thumbnails.medium.url;
-    } else if (data.thumbnails && data.thumbnails.default) {
-      image = data.thumbnails.default.url;
-    } else if (data.og_tags && data.og_tags.image && data.og_tags.image.startsWith('http')) {
-      image = data.og_tags.image;
-    } else if (data.twitter_tags && data.twitter_tags["image:src"] && data.twitter_tags["image:src"].startsWith('http')) {
-      image = data.twitter_tags["image:src"];
-    } else if (data.ogImage && data.ogImage.startsWith('http')) {
-      image = data.ogImage;
-    } else if (data.image && data.image.startsWith('http')) {
-      image = data.image;
-    } else if (data.thumbnails && data.thumbnails.high) {
-      image = data.thumbnails.high.url;
-    } else if (data.thumbnails && data.thumbnails.low) {
-      image = data.thumbnails.low.url;
-    }
-    
-    // For YouTube videos, use high-quality thumbnail
-    if (longUrl.includes('youtube.com') && data.thumbnails) {
-      if (data.thumbnails.high) {
-        image = data.thumbnails.high.url;
-      } else if (data.thumbnails.medium) {
-        image = data.thumbnails.medium.url;
-      } else if (data.thumbnails.default) {
-        image = data.thumbnails.default.url;
-      }
-    }
-    
-    // If no meaningful image found, don't use favicon as fallback
-    // This prevents showing favicons as post images
-    if (!image || image.includes('favicon') || image.includes('google.com/s2/favicons')) {
-      image = '';
-    }
-    
+    const description =
+      customDescription ||
+      data.description ||
+      data.metaDescription ||
+      `Visit ${domain} for more information and content.`;
+
     console.log("🔍 Enhanced metadata extraction:", {
       originalUrl: longUrl,
       title: title,
       description: description?.substring(0, 100) + '...',
-      image: image,
-      hasThumbnails: !!data.thumbnails,
-      thumbnailCount: data.thumbnails ? Object.keys(data.thumbnails).length : 0,
-      imageSource: image ? 'Lambda API' : 'No image found'
     });
     
-    const result = {
+    return {
       faviconUrl: fallbackFavicon,
       metaTitle: title,
       metaDescription: description,
-      onImage: image,
     };
-
-    return result;
   } catch (err) {
     logError("❌ Error fetching metadata from Lambda API:", err.message);
     
-    // Check if it's a 404 or similar error
     if (err.message.includes('404') || err.message.includes('Not Found')) {
       console.log("⚠️ URL appears to be invalid or no longer exists:", longUrl);
     }
-    
-    // Fallback to old method if Lambda API fails
+
+    // Fallback to old method
     try {
       const encodedUrl = encodeURIComponent(longUrl);
       const res = await fetch(`/api/metadata?url=${encodedUrl}`);
@@ -449,66 +244,35 @@ const getMetadata = async (longUrl) => {
       const domain = new URL(longUrl).hostname;
       const fallbackFavicon = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
 
-      // Select the best favicon from available options
       const getBestFavicon = (favicons) => {
         if (!favicons || favicons.length === 0) return fallbackFavicon;
-        
-        // Priority order: apple-touch-icon > 32x32 png > 16x16 png > any icon
         const priorities = [
           (f) => f.rel === 'apple-touch-icon' && f.sizes === '180x180',
           (f) => f.rel === 'icon' && f.sizes === '32x32' && f.type === 'image/png',
           (f) => f.rel === 'icon' && f.sizes === '16x16' && f.type === 'image/png',
           (f) => f.rel === 'apple-touch-icon',
           (f) => f.rel === 'icon' && f.type === 'image/png',
-          (f) => f.rel === 'icon'
+          (f) => f.rel === 'icon',
         ];
-        
         for (const priority of priorities) {
           const favicon = favicons.find(priority);
           if (favicon && favicon.href) return favicon.href;
         }
-        
         return favicons[0]?.href || fallbackFavicon;
       };
 
       const selectedFavicon = getBestFavicon(data.favicons);
-      
-      // Extract the best image for rich link previews
-      const getBestImage = () => {
-        // Priority: og:image > twitter:image > first image
-        if (data.ogImage && data.ogImage.trim() && data.ogImage.startsWith('http')) return data.ogImage;
-        if (data.og_image && data.og_image.trim() && data.og_image.startsWith('http')) return data.og_image;
-        if (data.twitterImage && data.twitterImage.trim() && data.twitterImage.startsWith('http')) return data.twitterImage;
-        if (data.twitter_image && data.twitter_image.trim() && data.twitter_image.startsWith('http')) return data.twitter_image;
-        if (data.image && data.image.trim() && data.image.startsWith('http')) return data.image;
-        
-        // Don't use favicon as fallback for post images
-        return '';
-      };
-      
-      const bestImage = getBestImage();
-      
+
       console.log("🔍 Fallback metadata extraction:", {
         originalUrl: longUrl,
-        ogImage: data.ogImage,
-        og_image: data.og_image,
-        twitterImage: data.twitterImage,
-        twitter_image: data.twitter_image,
-        image: data.image,
         selectedFavicon: selectedFavicon,
-        bestImage: bestImage,
-        hasValidImage: !!bestImage && bestImage.startsWith('http')
       });
       
-      const result = {
+      return {
         faviconUrl: selectedFavicon,
         metaTitle: data.title || data.metaTitle || "",
-        // Priority still respects custom description if available
         metaDescription: data.description || "",
-        onImage: bestImage,
       };
-
-      return result;
     } catch (fallbackErr) {
       logError("❌ Fallback metadata extraction also failed:", fallbackErr.message);
       const domain = new URL(longUrl).hostname;
@@ -516,11 +280,11 @@ const getMetadata = async (longUrl) => {
         faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${domain}`,
         metaTitle: `${domain} - Page`,
         metaDescription: `Visit ${domain} for more information and content.`,
-        onImage: '', // Don't use favicon as post image
       };
     }
   }
 };
+
 
 // Performance monitoring utility
 const performanceMetrics = {
@@ -861,14 +625,10 @@ const getUrlDetailsByAlias = async (alias) => {
 export {
   getUserLocation,
   getVisitor,
-  getBGData,
-  advertView,
-  getCountries,
   gethistory,
   getMetadata,
   shortenUrl,
   deleteHistory,
   getRedirect,
-  getUrlDetailsByAlias,
-  isSocialMediaCrawler
+  getUrlDetailsByAlias
 };
