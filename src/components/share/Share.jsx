@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 
 // --- ICONS ARRAY (Stable, outside component) ---
 const icons = [
+  "/images/share/Copy Icon B.svg",
   "/images/share/Share Icon B.svg",
   "/images/share/Copy Icon B.svg",
   "/images/share/ZIMOJI B.svg",
