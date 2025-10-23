@@ -17,7 +17,7 @@ const iconsList = [
   { src: "/images/share/BlueSky B.svg", platform: "bluesky" },
   { src: "/images/share/Reddit B.svg", platform: "reddit" },
   { src: "/images/share/Discord B.svg", platform: "discord" },
-  { src: "/images/share/Sina Weibo B.svg", platform: "weibo" }
+  { src: "/images/share/Sina Weibo B.svg", platform: "weibo" },
 ];
 
 export default function Share({ start, onAnimationComplete }) {
@@ -81,7 +81,7 @@ export default function Share({ start, onAnimationComplete }) {
       case "weibo":
         shareUrl = `https://service.weibo.com/share/share.php?url=${encodedUrl}`;
         break;
-         case "generic":
+      case "generic":
         if (navigator.share) {
           try {
             await navigator.share({
@@ -134,7 +134,6 @@ export default function Share({ start, onAnimationComplete }) {
       initial={{ opacity: 0 }}
       animate={start ? { opacity: 1 } : {}}
       transition={{ duration: 0.6 }}
-      onAnimationComplete={onAnimationComplete}
     >
       {/* --- ICONS ROW --- */}
       <div className="overflow-hidden w-[500px]">
@@ -171,6 +170,9 @@ export default function Share({ start, onAnimationComplete }) {
         initial={{ opacity: 0 }}
         animate={iconsDone ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.6 }}
+        onAnimationComplete={() => {
+          if (iconsDone) onAnimationComplete?.(); // ✅ Footer trigger only after arrows visible
+        }}
       >
         {/* Left Arrow */}
         <button

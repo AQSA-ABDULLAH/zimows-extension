@@ -21,7 +21,7 @@ function Home({ setActivePage }) {
       />
       <Share
         start={startShareAnimation}
-        onAnimationComplete={() => setStartFooterAnimation(true)} // 👈 trigger footer
+        onAnimationComplete={() => setStartFooterAnimation(true)}
       />
       <Footer start={startFooterAnimation} />
     </div>
