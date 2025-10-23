@@ -78,7 +78,12 @@ export default function CardContent({ start, onAnimationComplete }) {
 
   // -------------------- 🚀 Fetch Short URL --------------------
   useEffect(() => {
-    if (originalUrl && visitorId && !hasSubmittedRef.current && status !== "loading") {
+    if (
+      originalUrl &&
+      visitorId &&
+      !hasSubmittedRef.current &&
+      status !== "loading"
+    ) {
       dispatch(fetchShortUrl({ longUrl: originalUrl, visitorId }));
       hasSubmittedRef.current = true;
     }
@@ -88,8 +93,16 @@ export default function CardContent({ start, onAnimationComplete }) {
   useEffect(() => {
     if (status === "success" && !hasAddedHistoryRef.current && shortUrlId) {
       const now = new Date();
-      const time = now.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
-      const date = now.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+      const time = now.toLocaleTimeString("en-US", {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const date = now.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
 
       const newData = {
         shortUrl,
@@ -136,14 +149,23 @@ export default function CardContent({ start, onAnimationComplete }) {
 
   // -------------------- ⚠️ Handle API Error --------------------
   useEffect(() => {
-    if (status === "error") setError(shortUrlError || "An unknown error occurred.");
+    if (status === "error")
+      setError(shortUrlError || "An unknown error occurred.");
   }, [status, shortUrlError]);
 
   // -------------------- 💬 Typing Effects --------------------
   const displayShortUrl = animationData?.shortUrl?.replace(/^https?:\/\//, "");
   const typedShortUrl = useTypingEffect(displayShortUrl, 50, startShortUrl);
-  const typedHeading = useTypingEffect(animationData?.metaTitle, 30, startHeading);
-  const typedOriginalUrl = useTypingEffect(animationData?.originalUrl, 25, startOriginalUrl);
+  const typedHeading = useTypingEffect(
+    animationData?.metaTitle,
+    30,
+    startHeading
+  );
+  const typedOriginalUrl = useTypingEffect(
+    animationData?.originalUrl,
+    25,
+    startOriginalUrl
+  );
 
   // -------------------- 🕹️ Animation Sequence --------------------
   useEffect(() => {
@@ -157,7 +179,10 @@ export default function CardContent({ start, onAnimationComplete }) {
     const shortUrlTimeout = setTimeout(() => setStartShortUrl(true), 1000);
 
     const headingDelay = 1000 + (displayShortUrl?.length * 50 || 0) + 500;
-    const headingTimeout = setTimeout(() => setStartHeading(true), headingDelay);
+    const headingTimeout = setTimeout(
+      () => setStartHeading(true),
+      headingDelay
+    );
 
     const totalTypingTime =
       1000 +
@@ -165,7 +190,10 @@ export default function CardContent({ start, onAnimationComplete }) {
       (animationData.metaTitle?.length * 30 || 0) +
       800;
 
-    const originalUrlTimeout = setTimeout(() => setStartOriginalUrl(true), totalTypingTime);
+    const originalUrlTimeout = setTimeout(
+      () => setStartOriginalUrl(true),
+      totalTypingTime
+    );
 
     return () => {
       clearTimeout(logoTimeout);
@@ -180,7 +208,12 @@ export default function CardContent({ start, onAnimationComplete }) {
     if (startShortUrl && animationData?.shortUrl && !hasAutoCopiedRef.current) {
       navigator.clipboard
         .writeText(animationData.shortUrl)
-        .then(() => console.log("✅ Short URL copied automatically:", animationData.shortUrl))
+        .then(() =>
+          console.log(
+            "✅ Short URL copied automatically:",
+            animationData.shortUrl
+          )
+        )
         .catch((err) => console.error("❌ Copy failed:", err));
       hasAutoCopiedRef.current = true;
     }
@@ -218,12 +251,12 @@ export default function CardContent({ start, onAnimationComplete }) {
   return (
     <div className="flex items-center gap-[20px] ml-[10px] mb-[48px]">
       {/* Left Line */}
-      <div className="w-[1px] h-[195px]">
+      <div className="flex-shrink-0 w-[1px] h-auto">
         {showLine && (
           <motion.img
             src="/images/card/WS Chrome Line.svg"
             alt="line"
-            className="w-[1px] h-[195px]"
+            className="w-[1px] h-full object-contain"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
@@ -240,10 +273,15 @@ export default function CardContent({ start, onAnimationComplete }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              src={animationData?.faviconUrl || "images/card/logo/default-favicon.png"}
+              src={
+                animationData?.faviconUrl ||
+                "images/card/logo/default-favicon.png"
+              }
               alt="Favicon"
               className="h-[30px] w-[30px]"
-              onError={(e) => (e.target.src = "images/card/logo/default-favicon.png")}
+              onError={(e) =>
+                (e.target.src = "images/card/logo/default-favicon.png")
+              }
             />
           )}
           <a
@@ -257,7 +295,9 @@ export default function CardContent({ start, onAnimationComplete }) {
         </div>
 
         {/* Title */}
-        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">{typedHeading}</h3>
+        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">
+          {typedHeading}
+        </h3>
 
         {/* Original URL */}
         <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]">
@@ -317,7 +357,10 @@ export default function CardContent({ start, onAnimationComplete }) {
               className="h-[22px] cursor-pointer"
               onClick={() => {
                 if (navigator.share && animationData?.shortUrl) {
-                  navigator.share({ title: "Check this link!", url: animationData.shortUrl });
+                  navigator.share({
+                    title: "Check this link!",
+                    url: animationData.shortUrl,
+                  });
                 } else if (animationData?.shortUrl) {
                   navigator.clipboard.writeText(animationData.shortUrl);
                   alert("Link copied to clipboard!");
