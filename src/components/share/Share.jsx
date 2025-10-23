@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux"; // ✅ Added
 import { motion } from "framer-motion";
 
 const iconsList = [
@@ -13,7 +14,7 @@ const iconsList = [
   { src: "/images/share/X B.svg", platform: "x" },
   { src: "/images/share/WeChat B.svg", platform: "wechat" },
   { src: "/images/share/Threads B.svg", platform: "threads" },
-  { src: "/images/share/BlueSky B.svg", platform: "BlueSky" },
+  { src: "/images/share/BlueSky B.svg", platform: "bluesky" },
   { src: "/images/share/Reddit B.svg", platform: "reddit" },
   { src: "/images/share/Discord B.svg", platform: "discord" },
   { src: "/images/share/Sina Weibo B.svg", platform: "weibo" },
@@ -21,10 +22,93 @@ const iconsList = [
 ];
 
 export default function Share({ start, onAnimationComplete }) {
+  const shortUrl = useSelector((state) => state.shortUrl.shortUrl); // ✅ Redux state
   const [scrollIndex, setScrollIndex] = useState(0);
-  const visibleCount = 9; // how many icons fit visible width
+  const visibleCount = 9;
   const maxIndex = Math.max(0, iconsList.length - visibleCount);
 
+  // --- SHARE HANDLER ---
+  const handleShare = async (platform) => {
+    if (!shortUrl) return;
+    const encodedUrl = encodeURIComponent(shortUrl);
+    let shareUrl = "";
+
+    switch (platform) {
+      case "copy":
+        try {
+          await navigator.clipboard.writeText(shortUrl);
+          console.log("✅ URL copied to clipboard");
+        } catch (err) {
+          console.error("❌ Copy failed:", err);
+        }
+        return;
+
+      case "email":
+        shareUrl = `mailto:?subject=Share WS by ZIMO&body=${encodedUrl}`;
+        break;
+      case "whatsapp":
+        shareUrl = `https://wa.me/?text=Share WS by ZIMO - ${encodedUrl}`;
+        break;
+      case "telegram":
+        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=Share WS by ZIMO`;
+        break;
+      case "x":
+        shareUrl = `https://twitter.com/intent/tweet?text=Share WS by ZIMO%0A${encodedUrl}`;
+        break;
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        break;
+      case "reddit":
+        shareUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=Share WS by ZIMO`;
+        break;
+      case "threads":
+        shareUrl = `https://www.threads.net/intent/post?text=Share WS by ZIMO%0A${encodedUrl}`;
+        break;
+      case "bluesky":
+        shareUrl = `https://bsky.app/intent/compose?text=Share WS by ZIMO%0A${encodedUrl}`;
+        break;
+      case "discord":
+        shareUrl = `https://discord.com/`;
+        break;
+      case "wechat":
+        shareUrl = `https://www.wechat.com/`;
+        break;
+      case "weibo":
+        shareUrl = `https://service.weibo.com/share/share.php?url=${encodedUrl}`;
+        break;
+      case "zimoji":
+        shareUrl = `https://zimoji.org`;
+        break;
+      case "omn":
+        shareUrl = `https://omnium.social/`;
+        break;
+      case "messenger":
+        shareUrl = `https://www.messenger.com/`;
+        break;
+      case "generic":
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "Share WS by ZIMO",
+              text: `Share WS by ZIMO - ${shortUrl}`,
+              url: shortUrl,
+            });
+          } catch {
+            await navigator.clipboard.writeText(shortUrl);
+          }
+        } else {
+          await navigator.clipboard.writeText(shortUrl);
+        }
+        return;
+      default:
+        await navigator.clipboard.writeText(shortUrl);
+        return;
+    }
+
+    window.open(shareUrl, "_blank");
+  };
+
+  // --- SLIDER CONTROL ---
   const handleNext = () => {
     setScrollIndex((prev) => (prev < maxIndex ? prev + 1 : prev));
   };
@@ -34,17 +118,17 @@ export default function Share({ start, onAnimationComplete }) {
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center w-full py-4 space-y-2"
+      className="flex flex-col items-center justify-center w-full"
       initial={{ opacity: 0, y: 30 }}
       animate={start ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6 }}
       onAnimationComplete={onAnimationComplete}
     >
       {/* --- ICONS ROW --- */}
-      <div className="overflow-hidden w-[460px]">
+      <div className="overflow-hidden w-[500px]">
         <motion.div
-          className="flex items-center gap-5"
-          animate={{ x: -scrollIndex * 52 }} // each icon + gap ≈ 52px
+          className="flex gap-[25px] mx-[24px] mt-[29px] mb-[20px]"
+          animate={{ x: -scrollIndex * 52 }}
           transition={{ type: "tween", duration: 0.4 }}
         >
           {iconsList.map((icon) => (
@@ -54,6 +138,7 @@ export default function Share({ start, onAnimationComplete }) {
               alt={icon.platform}
               className="h-[25.52px] cursor-pointer transition-transform duration-150"
               whileTap={{ scale: 0.9 }}
+              onClick={() => handleShare(icon.platform)}
             />
           ))}
         </motion.div>
@@ -66,7 +151,7 @@ export default function Share({ start, onAnimationComplete }) {
           className={`transition-opacity ${
             scrollIndex === 0
               ? "opacity-0 cursor-default"
-              : "opacity-50 hover:opacity-100 "
+              : "opacity-50 hover:opacity-100"
           }`}
         >
           <img
