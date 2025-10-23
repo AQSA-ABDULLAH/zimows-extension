@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchShortUrl } from "../../store/features/shortUrlSlice";
 import { addHistoryItem } from "../../store/features/historySlice";
 
-// Typing Effect Hook
+// -------------------- ✨ Typing Effect Hook --------------------
 function useTypingEffect(text, delay = 40, start = true) {
   const [displayedText, setDisplayedText] = useState("");
 
@@ -14,19 +14,25 @@ function useTypingEffect(text, delay = 40, start = true) {
       setDisplayedText("");
       return;
     }
+
     let i = 0;
     const interval = setInterval(() => {
       setDisplayedText(text.slice(0, i + 1));
       i++;
       if (i === text.length) clearInterval(interval);
     }, delay);
+
     return () => clearInterval(interval);
   }, [text, delay, start]);
 
   return displayedText;
 }
 
+// -------------------- ✨ Main Component --------------------
 export default function CardContent({ start, onAnimationComplete }) {
+  const dispatch = useDispatch();
+
+  // ---------- Local States ----------
   const [originalUrl, setOriginalUrl] = useState("");
   const [error, setError] = useState("");
   const [animationData, setAnimationData] = useState(null);
@@ -39,10 +45,12 @@ export default function CardContent({ start, onAnimationComplete }) {
   const [showDateTime, setShowDateTime] = useState(false);
   const [showIcons, setShowIcons] = useState([false, false, false]);
 
+  // ---------- Refs ----------
   const hasSubmittedRef = useRef(false);
   const hasAddedHistoryRef = useRef(false);
+  const hasAutoCopiedRef = useRef(false);
 
-  const dispatch = useDispatch();
+  // ---------- Redux Data ----------
   const visitorId = useSelector((state) => state.visitor.data?.visitor_id);
   const {
     status,
@@ -57,20 +65,18 @@ export default function CardContent({ start, onAnimationComplete }) {
     originalUrl: reduxOriginalUrl,
   } = useSelector((state) => state.shortUrl);
 
-  // Detect current tab URL
+  // -------------------- 🔍 Detect Current Tab URL --------------------
   useEffect(() => {
     if (window.chrome?.tabs) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.url) setOriginalUrl(tabs[0].url);
       });
     } else {
-      setOriginalUrl(
-        "https://example.com/this-is-a-longer-fallback-url-for-testing-animation-timing"
-      );
+      setOriginalUrl("https://example.com/sample-url-for-testing");
     }
   }, []);
 
-  // Fetch short URL
+  // -------------------- 🚀 Fetch Short URL --------------------
   useEffect(() => {
     if (
       originalUrl &&
@@ -83,7 +89,7 @@ export default function CardContent({ start, onAnimationComplete }) {
     }
   }, [originalUrl, visitorId, dispatch, status]);
 
-  // Handle API Success
+  // -------------------- ✅ Handle API Success --------------------
   useEffect(() => {
     if (status === "success" && !hasAddedHistoryRef.current && shortUrlId) {
       const now = new Date();
@@ -98,14 +104,16 @@ export default function CardContent({ start, onAnimationComplete }) {
         year: "numeric",
       });
 
-      setAnimationData({
+      const newData = {
         shortUrl,
         metaTitle,
         originalUrl: reduxOriginalUrl,
         faviconUrl,
         time,
         date,
-      });
+      };
+
+      setAnimationData(newData);
 
       dispatch(
         addHistoryItem({
@@ -139,30 +147,19 @@ export default function CardContent({ start, onAnimationComplete }) {
     dispatch,
   ]);
 
-  // Handle API Error
+  // -------------------- ⚠️ Handle API Error --------------------
   useEffect(() => {
-    if (status === "error") {
-      setError(shortUrlError || "An unknown error occurred.");
-    }
+    if (status === "error") setError(shortUrlError || "An unknown error occurred.");
   }, [status, shortUrlError]);
 
-  const typedShortUrl = useTypingEffect(
-    animationData?.shortUrl,
-    50,
-    startShortUrl
-  );
-  const typedHeading = useTypingEffect(
-    animationData?.metaTitle,
-    30,
-    startHeading
-  );
-  const typedOriginalUrl = useTypingEffect(
-    animationData?.originalUrl,
-    25,
-    startOriginalUrl
-  );
+  // -------------------- 💬 Typing Effects --------------------
+  // Strip "https://" for display only
+  const displayShortUrl = animationData?.shortUrl?.replace(/^https?:\/\//, "");
+  const typedShortUrl = useTypingEffect(displayShortUrl, 50, startShortUrl);
+  const typedHeading = useTypingEffect(animationData?.metaTitle, 30, startHeading);
+  const typedOriginalUrl = useTypingEffect(animationData?.originalUrl, 25, startOriginalUrl);
 
-  // Animation sequence
+  // -------------------- 🕹️ Animation Sequence --------------------
   useEffect(() => {
     if (start) setShowLine(true);
   }, [start]);
@@ -172,21 +169,17 @@ export default function CardContent({ start, onAnimationComplete }) {
 
     const logoTimeout = setTimeout(() => setShowLogo(true), 300);
     const shortUrlTimeout = setTimeout(() => setStartShortUrl(true), 1000);
-    const headingDelay =
-      1000 + (animationData.shortUrl?.length * 50 || 0) + 500;
-    const headingTimeout = setTimeout(
-      () => setStartHeading(true),
-      headingDelay
-    );
+
+    const headingDelay = 1000 + (displayShortUrl?.length * 50 || 0) + 500;
+    const headingTimeout = setTimeout(() => setStartHeading(true), headingDelay);
+
     const totalTypingTime =
       1000 +
-      (animationData.shortUrl?.length * 50 || 0) +
+      (displayShortUrl?.length * 50 || 0) +
       (animationData.metaTitle?.length * 30 || 0) +
       800;
-    const originalUrlTimeout = setTimeout(
-      () => setStartOriginalUrl(true),
-      totalTypingTime
-    );
+
+    const originalUrlTimeout = setTimeout(() => setStartOriginalUrl(true), totalTypingTime);
 
     return () => {
       clearTimeout(logoTimeout);
@@ -194,49 +187,38 @@ export default function CardContent({ start, onAnimationComplete }) {
       clearTimeout(headingTimeout);
       clearTimeout(originalUrlTimeout);
     };
-  }, [showLine, animationData]);
+  }, [showLine, animationData, displayShortUrl]);
 
+  // -------------------- 🧠 Auto Copy Short URL --------------------
+  useEffect(() => {
+    if (startShortUrl && animationData?.shortUrl && !hasAutoCopiedRef.current) {
+      navigator.clipboard
+        .writeText(animationData.shortUrl)
+        .then(() => console.log("✅ Short URL copied:", animationData.shortUrl))
+        .catch((err) => console.error("❌ Copy failed:", err));
+      hasAutoCopiedRef.current = true;
+    }
+  }, [startShortUrl, animationData]);
+
+  // -------------------- ⏱️ Show Date, Time & Icons --------------------
   useEffect(() => {
     if (!startOriginalUrl || !animationData) return;
 
-    const originalUrlTypingDuration =
-      (animationData.originalUrl?.length || 0) * 25;
-
+    const duration = (animationData.originalUrl?.length || 0) * 25;
     const timeouts = [];
 
     timeouts.push(
-      setTimeout(() => setShowDateTime(true), originalUrlTypingDuration + 500)
-    );
-    timeouts.push(
-      setTimeout(
-        () => setShowIcons([true, false, false]),
-        originalUrlTypingDuration + 900
-      )
-    );
-    timeouts.push(
-      setTimeout(
-        () => setShowIcons([true, true, false]),
-        originalUrlTypingDuration + 1200
-      )
-    );
-    timeouts.push(
-      setTimeout(
-        () => setShowIcons([true, true, true]),
-        originalUrlTypingDuration + 1500
-      )
-    );
-
-    const totalTimeForAllAnimations = originalUrlTypingDuration + 1500 + 600;
-
-    timeouts.push(
-      setTimeout(() => {
-        if (onAnimationComplete) onAnimationComplete();
-      }, totalTimeForAllAnimations)
+      setTimeout(() => setShowDateTime(true), duration + 500),
+      setTimeout(() => setShowIcons([true, false, false]), duration + 900),
+      setTimeout(() => setShowIcons([true, true, false]), duration + 1200),
+      setTimeout(() => setShowIcons([true, true, true]), duration + 1500),
+      setTimeout(() => onAnimationComplete?.(), duration + 2100)
     );
 
     return () => timeouts.forEach(clearTimeout);
   }, [startOriginalUrl, animationData, onAnimationComplete]);
 
+  // -------------------- ❌ Error UI --------------------
   if (error) {
     return (
       <div className="flex items-center justify-center h-[195px] text-red-600 font-arial p-4">
@@ -245,8 +227,10 @@ export default function CardContent({ start, onAnimationComplete }) {
     );
   }
 
+  // -------------------- 🎨 UI --------------------
   return (
-    <div className="flex item-center gap-[20px] ml-[10px] mb-[48px]">
+    <div className="flex items-center gap-[20px] ml-[10px] mb-[48px]">
+      {/* Left Line */}
       <div className="w-[1px] h-[195px]">
         {showLine && (
           <motion.img
@@ -260,22 +244,19 @@ export default function CardContent({ start, onAnimationComplete }) {
         )}
       </div>
 
-      <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline font-arial text-[#000] tracking-[1.2px] ml-[10px] leading-none">
+      {/* Right Content */}
+      <div className="flex flex-col justify-between h-[192px] text-[12px] font-arial text-[#000] tracking-[1.2px] ml-[10px] leading-none">
+        {/* Favicon + Short URL */}
         <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
           {showLogo && (
             <motion.img
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              src={
-                animationData?.faviconUrl ||
-                "images/card/logo/default-favicon.png"
-              }
+              src={animationData?.faviconUrl || "images/card/logo/default-favicon.png"}
               alt="Favicon"
               className="h-[30px] w-[30px]"
-              onError={(e) => {
-                e.target.src = "images/card/logo/default-favicon.png";
-              }}
+              onError={(e) => (e.target.src = "images/card/logo/default-favicon.png")}
             />
           )}
           <a
@@ -288,14 +269,15 @@ export default function CardContent({ start, onAnimationComplete }) {
           </a>
         </div>
 
-        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">
-          {typedHeading}
-        </h3>
+        {/* Title */}
+        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">{typedHeading}</h3>
 
+        {/* Original URL */}
         <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]">
           {typedOriginalUrl}
         </p>
 
+        {/* Date & Time */}
         {showDateTime && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -308,6 +290,7 @@ export default function CardContent({ start, onAnimationComplete }) {
           </motion.div>
         )}
 
+        {/* Action Icons */}
         <div className="flex gap-[50px]">
           {showIcons[0] && (
             <motion.img
@@ -315,10 +298,12 @@ export default function CardContent({ start, onAnimationComplete }) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
               src="/images/card/Open in New Window.svg"
-              alt="open window"
+              alt="open"
               className="h-[22px] cursor-pointer"
+              onClick={() => window.open(animationData?.shortUrl, "_blank")}
             />
           )}
+
           {showIcons[1] && (
             <motion.img
               initial={{ opacity: 0 }}
@@ -327,8 +312,14 @@ export default function CardContent({ start, onAnimationComplete }) {
               src="/images/card/Copy Icon B.svg"
               alt="copy"
               className="h-[22px] cursor-pointer"
+              onClick={() => {
+                if (animationData?.shortUrl) {
+                  navigator.clipboard.writeText(animationData.shortUrl);
+                }
+              }}
             />
           )}
+
           {showIcons[2] && (
             <motion.img
               initial={{ opacity: 0 }}
@@ -337,6 +328,17 @@ export default function CardContent({ start, onAnimationComplete }) {
               src="/images/card/Share Icon B.svg"
               alt="share"
               className="h-[22px] cursor-pointer"
+              onClick={() => {
+                if (navigator.share && animationData?.shortUrl) {
+                  navigator.share({
+                    title: "Check this link!",
+                    url: animationData.shortUrl,
+                  });
+                } else {
+                  navigator.clipboard.writeText(animationData.shortUrl);
+                  alert("Link copied to clipboard!");
+                }
+              }}
             />
           )}
         </div>

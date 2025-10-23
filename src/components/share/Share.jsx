@@ -212,7 +212,7 @@ export default function Share({ start = false, onAnimationComplete }) {
           }`}
           onClick={() => canScrollLeft && handleScroll("left")}
           initial={{ opacity: 0 }}
-          animate={{ opacity: canScrollLeft ? 1 : 0 }}
+          animate={{ opacity: canScrollLeft ? 0.5 : 0 }}
           transition={{ duration: 0.3 }}
         />
 
@@ -227,7 +227,7 @@ export default function Share({ start = false, onAnimationComplete }) {
           }`}
           onClick={() => canScrollRight && handleScroll("right")}
           initial={{ opacity: 0 }}
-          animate={{ opacity: canScrollRight ? 1 : 0 }}
+          animate={{ opacity: canScrollRight ? 0.5 : 0 }}
           transition={{ duration: 0.3 }}
         />
       </div>
