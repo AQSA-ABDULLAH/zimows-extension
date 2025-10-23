@@ -568,6 +568,7 @@ const gethistory = async (visitorId) => {
     const { data } = await request_lamda3.get(
       `/api/url-history?visitor_id=${visitorId}`
     );
+    console.log("📜 API Response:", data);
     return data;
   } catch (e) {
     logError("error while fetching visitor", e.message);
