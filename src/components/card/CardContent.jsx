@@ -78,12 +78,7 @@ export default function CardContent({ start, onAnimationComplete }) {
 
   // -------------------- 🚀 Fetch Short URL --------------------
   useEffect(() => {
-    if (
-      originalUrl &&
-      visitorId &&
-      !hasSubmittedRef.current &&
-      status !== "loading"
-    ) {
+    if (originalUrl && visitorId && !hasSubmittedRef.current && status !== "loading") {
       dispatch(fetchShortUrl({ longUrl: originalUrl, visitorId }));
       hasSubmittedRef.current = true;
     }
@@ -93,16 +88,8 @@ export default function CardContent({ start, onAnimationComplete }) {
   useEffect(() => {
     if (status === "success" && !hasAddedHistoryRef.current && shortUrlId) {
       const now = new Date();
-      const time = now.toLocaleTimeString("en-US", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      const date = now.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      });
+      const time = now.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+      const date = now.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
 
       const newData = {
         shortUrl,
@@ -153,7 +140,6 @@ export default function CardContent({ start, onAnimationComplete }) {
   }, [status, shortUrlError]);
 
   // -------------------- 💬 Typing Effects --------------------
-  // Strip "https://" for display only
   const displayShortUrl = animationData?.shortUrl?.replace(/^https?:\/\//, "");
   const typedShortUrl = useTypingEffect(displayShortUrl, 50, startShortUrl);
   const typedHeading = useTypingEffect(animationData?.metaTitle, 30, startHeading);
@@ -189,12 +175,12 @@ export default function CardContent({ start, onAnimationComplete }) {
     };
   }, [showLine, animationData, displayShortUrl]);
 
-  // -------------------- 🧠 Auto Copy Short URL --------------------
+  // -------------------- 🧠 Auto Copy Short URL (once) --------------------
   useEffect(() => {
     if (startShortUrl && animationData?.shortUrl && !hasAutoCopiedRef.current) {
       navigator.clipboard
         .writeText(animationData.shortUrl)
-        .then(() => console.log("✅ Short URL copied:", animationData.shortUrl))
+        .then(() => console.log("✅ Short URL copied automatically:", animationData.shortUrl))
         .catch((err) => console.error("❌ Copy failed:", err));
       hasAutoCopiedRef.current = true;
     }
@@ -203,6 +189,7 @@ export default function CardContent({ start, onAnimationComplete }) {
   // -------------------- ⏱️ Show Date, Time & Icons --------------------
   useEffect(() => {
     if (!startOriginalUrl || !animationData) return;
+    if (showDateTime || showIcons.includes(true)) return; // prevent re-trigger
 
     const duration = (animationData.originalUrl?.length || 0) * 25;
     const timeouts = [];
@@ -216,7 +203,7 @@ export default function CardContent({ start, onAnimationComplete }) {
     );
 
     return () => timeouts.forEach(clearTimeout);
-  }, [startOriginalUrl, animationData, onAnimationComplete]);
+  }, [startOriginalUrl, animationData]);
 
   // -------------------- ❌ Error UI --------------------
   if (error) {
@@ -330,11 +317,8 @@ export default function CardContent({ start, onAnimationComplete }) {
               className="h-[22px] cursor-pointer"
               onClick={() => {
                 if (navigator.share && animationData?.shortUrl) {
-                  navigator.share({
-                    title: "Check this link!",
-                    url: animationData.shortUrl,
-                  });
-                } else {
+                  navigator.share({ title: "Check this link!", url: animationData.shortUrl });
+                } else if (animationData?.shortUrl) {
                   navigator.clipboard.writeText(animationData.shortUrl);
                   alert("Link copied to clipboard!");
                 }
