@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux"; // ✅ Added
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
 const iconsList = [
@@ -17,15 +17,20 @@ const iconsList = [
   { src: "/images/share/BlueSky B.svg", platform: "bluesky" },
   { src: "/images/share/Reddit B.svg", platform: "reddit" },
   { src: "/images/share/Discord B.svg", platform: "discord" },
-  { src: "/images/share/Sina Weibo B.svg", platform: "weibo" },
-  { src: "/images/share/Messenger B.svg", platform: "messenger" },
+  { src: "/images/share/Sina Weibo B.svg", platform: "weibo" }
 ];
 
 export default function Share({ start, onAnimationComplete }) {
-  const shortUrl = useSelector((state) => state.shortUrl.shortUrl); // ✅ Redux state
+  const shortUrl = useSelector((state) => state.shortUrl.shortUrl);
   const [scrollIndex, setScrollIndex] = useState(0);
-  const visibleCount = 9;
-  const maxIndex = Math.max(0, iconsList.length - visibleCount);
+  const [iconsDone, setIconsDone] = useState(false);
+
+  const visibleCount = 9; // how many icons fit
+  const iconWidth = 52; // width + gap approximation
+  const totalIcons = iconsList.length;
+
+  // ✅ Calculate maxIndex precisely so no extra gap appears
+  const maxIndex = Math.max(0, totalIcons - visibleCount);
 
   // --- SHARE HANDLER ---
   const handleShare = async (platform) => {
@@ -35,14 +40,14 @@ export default function Share({ start, onAnimationComplete }) {
 
     switch (platform) {
       case "copy":
-        try {
-          await navigator.clipboard.writeText(shortUrl);
-          console.log("✅ URL copied to clipboard");
-        } catch (err) {
-          console.error("❌ Copy failed:", err);
-        }
+        await navigator.clipboard.writeText(shortUrl);
         return;
-
+      case "zimoji":
+        shareUrl = `https://zimoji.org`;
+        break;
+      case "omn":
+        shareUrl = `https://omnium.social/`;
+        break;
       case "email":
         shareUrl = `mailto:?subject=Share WS by ZIMO&body=${encodedUrl}`;
         break;
@@ -58,8 +63,8 @@ export default function Share({ start, onAnimationComplete }) {
       case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
         break;
-      case "reddit":
-        shareUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=Share WS by ZIMO`;
+      case "wechat":
+        shareUrl = `https://www.wechat.com/`;
         break;
       case "threads":
         shareUrl = `https://www.threads.net/intent/post?text=Share WS by ZIMO%0A${encodedUrl}`;
@@ -70,22 +75,13 @@ export default function Share({ start, onAnimationComplete }) {
       case "discord":
         shareUrl = `https://discord.com/`;
         break;
-      case "wechat":
-        shareUrl = `https://www.wechat.com/`;
+      case "reddit":
+        shareUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=Share WS by ZIMO`;
         break;
       case "weibo":
         shareUrl = `https://service.weibo.com/share/share.php?url=${encodedUrl}`;
         break;
-      case "zimoji":
-        shareUrl = `https://zimoji.org`;
-        break;
-      case "omn":
-        shareUrl = `https://omnium.social/`;
-        break;
-      case "messenger":
-        shareUrl = `https://www.messenger.com/`;
-        break;
-      case "generic":
+         case "generic":
         if (navigator.share) {
           try {
             await navigator.share({
@@ -110,17 +106,33 @@ export default function Share({ start, onAnimationComplete }) {
 
   // --- SLIDER CONTROL ---
   const handleNext = () => {
-    setScrollIndex((prev) => (prev < maxIndex ? prev + 1 : prev));
+    setScrollIndex((prev) => (prev < maxIndex ? prev + 6 : prev));
   };
   const handlePrev = () => {
-    setScrollIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    setScrollIndex((prev) => (prev > 0 ? prev - 6 : prev));
   };
+
+  // --- ANIMATION VARIANTS ---
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.08 },
+    },
+  };
+  const iconVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+  };
+
+  // ✅ Clamp scrollIndex to avoid overshoot
+  const clampedIndex = Math.min(scrollIndex, maxIndex);
+  const translateX = -clampedIndex * iconWidth;
 
   return (
     <motion.div
       className="flex flex-col items-center justify-center w-full"
-      initial={{ opacity: 0, y: 30 }}
-      animate={start ? { opacity: 1, y: 0 } : {}}
+      initial={{ opacity: 0 }}
+      animate={start ? { opacity: 1 } : {}}
       transition={{ duration: 0.6 }}
       onAnimationComplete={onAnimationComplete}
     >
@@ -128,28 +140,44 @@ export default function Share({ start, onAnimationComplete }) {
       <div className="overflow-hidden w-[500px]">
         <motion.div
           className="flex gap-[25px] mx-[24px] mt-[29px] mb-[20px]"
-          animate={{ x: -scrollIndex * 52 }}
+          animate={{ x: translateX }}
           transition={{ type: "tween", duration: 0.4 }}
         >
-          {iconsList.map((icon) => (
-            <motion.img
-              key={icon.platform}
-              src={icon.src}
-              alt={icon.platform}
-              className="h-[25.52px] cursor-pointer transition-transform duration-150"
-              whileTap={{ scale: 0.9 }}
-              onClick={() => handleShare(icon.platform)}
-            />
-          ))}
+          <motion.div
+            className="flex gap-[25px]"
+            variants={containerVariants}
+            initial="hidden"
+            animate={start ? "visible" : "hidden"}
+            onAnimationComplete={() => setIconsDone(true)}
+          >
+            {iconsList.map((icon) => (
+              <motion.img
+                key={icon.platform}
+                src={icon.src}
+                alt={icon.platform}
+                variants={iconVariants}
+                className="h-[25.52px] cursor-pointer transition-transform duration-150"
+                whileTap={{ scale: 0.9 }}
+                onClick={() => handleShare(icon.platform)}
+              />
+            ))}
+          </motion.div>
         </motion.div>
       </div>
 
       {/* --- ARROWS BELOW --- */}
-      <div className="w-full flex items-center justify-between mb-[28.5px] px-[24px]">
+      <motion.div
+        className="w-full flex items-center justify-between mb-[28.5px] px-[24px]"
+        initial={{ opacity: 0 }}
+        animate={iconsDone ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Left Arrow */}
         <button
           onClick={handlePrev}
+          disabled={clampedIndex === 0}
           className={`transition-opacity ${
-            scrollIndex === 0
+            clampedIndex === 0
               ? "opacity-0 cursor-default"
               : "opacity-50 hover:opacity-100"
           }`}
@@ -161,10 +189,12 @@ export default function Share({ start, onAnimationComplete }) {
           />
         </button>
 
+        {/* Right Arrow */}
         <button
           onClick={handleNext}
+          disabled={clampedIndex >= maxIndex}
           className={`transition-opacity ${
-            scrollIndex === maxIndex
+            clampedIndex >= maxIndex
               ? "opacity-0 cursor-default"
               : "opacity-50 hover:opacity-100"
           }`}
@@ -175,7 +205,7 @@ export default function Share({ start, onAnimationComplete }) {
             className="h-[25.52px]"
           />
         </button>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
