@@ -52,7 +52,7 @@ export default function Share({ start, onAnimationComplete }) {
               key={icon.platform}
               src={icon.src}
               alt={icon.platform}
-              className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-150"
+              className="h-[25.52px] cursor-pointer transition-transform duration-150"
               whileTap={{ scale: 0.9 }}
             />
           ))}
@@ -60,10 +60,10 @@ export default function Share({ start, onAnimationComplete }) {
       </div>
 
       {/* --- ARROWS BELOW --- */}
-      <div className="flex items-center justify-between mb-[28.5px] px-[24px]">
+      <div className="w-full flex items-center justify-between mb-[28.5px] px-[24px]">
         <button
           onClick={handlePrev}
-          className={`p-1 transition-opacity ${
+          className={`transition-opacity ${
             scrollIndex === 0
               ? "opacity-0 cursor-default"
               : "opacity-50 hover:opacity-100 "
@@ -72,13 +72,13 @@ export default function Share({ start, onAnimationComplete }) {
           <img
             src="/images/share/Arrow Left B.svg"
             alt="Left"
-            className="w-5 h-5"
+            className="h-[25.52px]"
           />
         </button>
 
         <button
           onClick={handleNext}
-          className={`p-1 transition-opacity ${
+          className={`transition-opacity ${
             scrollIndex === maxIndex
               ? "opacity-0 cursor-default"
               : "opacity-50 hover:opacity-100"
@@ -87,7 +87,7 @@ export default function Share({ start, onAnimationComplete }) {
           <img
             src="/images/share/Arrow Right B.svg"
             alt="Right"
-            className="w-5 h-5"
+            className="h-[25.52px]"
           />
         </button>
       </div>
