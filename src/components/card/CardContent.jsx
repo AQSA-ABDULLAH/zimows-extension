@@ -292,7 +292,7 @@ export default function CardContent({ start, onAnimationComplete }) {
           {typedHeading}
         </h3>
 
-        <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[420px]">
+        <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]">
           {typedOriginalUrl}
         </p>
 

@@ -198,7 +198,7 @@ function HistoryCard({
         <h3 className="tracking-[1.5px] leading-[18px] line-clamp-2">{title}</h3>
 
         {/* Full Link */}
-        <p className="break-all line-clamp-2">{fullUrl}</p>
+        <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]">{fullUrl}</p>
 
         {/* Date & Time */}
         <div className="flex gap-[30px]">

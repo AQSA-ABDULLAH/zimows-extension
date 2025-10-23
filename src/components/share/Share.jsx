@@ -182,7 +182,7 @@ export default function Share({ start = false, onAnimationComplete }) {
     {/* ICONS ROW */}
     <div
       ref={scrollRef}
-      className="flex gap-[28px] mx-[24px] mt-[29px] mb-[20px] overflow-x-auto scroll-smooth no-scrollbar"
+      className="flex gap-[25px] mx-[24px] mt-[29px] mb-[20px] overflow-x-auto scroll-smooth no-scrollbar"
     >
       {visibleIcons.map(({ src, platform }) => (
         <motion.img
@@ -212,7 +212,7 @@ export default function Share({ start = false, onAnimationComplete }) {
           }`}
           onClick={() => canScrollLeft && handleScroll("left")}
           initial={{ opacity: 0 }}
-          animate={{ opacity: canScrollLeft ? 1 : 0.3 }}
+          animate={{ opacity: canScrollLeft ? 1 : 0 }}
           transition={{ duration: 0.3 }}
         />
 
@@ -227,7 +227,7 @@ export default function Share({ start = false, onAnimationComplete }) {
           }`}
           onClick={() => canScrollRight && handleScroll("right")}
           initial={{ opacity: 0 }}
-          animate={{ opacity: canScrollRight ? 1 : 0.3 }}
+          animate={{ opacity: canScrollRight ? 1 : 0 }}
           transition={{ duration: 0.3 }}
         />
       </div>
