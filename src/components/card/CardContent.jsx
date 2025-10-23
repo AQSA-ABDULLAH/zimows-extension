@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchShortUrl } from "../../store/features/shortUrlSlice"; 
-import { addHistoryItem } from "../../store/features/historySlice"; 
+import { fetchShortUrl } from "../../store/features/shortUrlSlice";
+import { addHistoryItem } from "../../store/features/historySlice";
 
 // Typing Effect Hook
 function useTypingEffect(text, delay = 40, start = true) {
@@ -72,7 +72,12 @@ export default function CardContent({ start, onAnimationComplete }) {
 
   // Fetch short URL
   useEffect(() => {
-    if (originalUrl && visitorId && !hasSubmittedRef.current && status !== "loading") {
+    if (
+      originalUrl &&
+      visitorId &&
+      !hasSubmittedRef.current &&
+      status !== "loading"
+    ) {
       dispatch(fetchShortUrl({ longUrl: originalUrl, visitorId }));
       hasSubmittedRef.current = true;
     }
@@ -87,9 +92,9 @@ export default function CardContent({ start, onAnimationComplete }) {
         hour: "2-digit",
         minute: "2-digit",
       });
-      const date = now.toLocaleDateString("en-US", {
-        month: "2-digit",
+      const date = now.toLocaleDateString("en-GB", {
         day: "2-digit",
+        month: "long",
         year: "numeric",
       });
 
@@ -141,9 +146,21 @@ export default function CardContent({ start, onAnimationComplete }) {
     }
   }, [status, shortUrlError]);
 
-  const typedShortUrl = useTypingEffect(animationData?.shortUrl, 50, startShortUrl);
-  const typedHeading = useTypingEffect(animationData?.metaTitle, 30, startHeading);
-  const typedOriginalUrl = useTypingEffect(animationData?.originalUrl, 25, startOriginalUrl);
+  const typedShortUrl = useTypingEffect(
+    animationData?.shortUrl,
+    50,
+    startShortUrl
+  );
+  const typedHeading = useTypingEffect(
+    animationData?.metaTitle,
+    30,
+    startHeading
+  );
+  const typedOriginalUrl = useTypingEffect(
+    animationData?.originalUrl,
+    25,
+    startOriginalUrl
+  );
 
   // Animation sequence
   useEffect(() => {
@@ -155,8 +172,12 @@ export default function CardContent({ start, onAnimationComplete }) {
 
     const logoTimeout = setTimeout(() => setShowLogo(true), 300);
     const shortUrlTimeout = setTimeout(() => setStartShortUrl(true), 1000);
-    const headingDelay = 1000 + (animationData.shortUrl?.length * 50 || 0) + 500;
-    const headingTimeout = setTimeout(() => setStartHeading(true), headingDelay);
+    const headingDelay =
+      1000 + (animationData.shortUrl?.length * 50 || 0) + 500;
+    const headingTimeout = setTimeout(
+      () => setStartHeading(true),
+      headingDelay
+    );
     const totalTypingTime =
       1000 +
       (animationData.shortUrl?.length * 50 || 0) +
@@ -187,17 +208,25 @@ export default function CardContent({ start, onAnimationComplete }) {
       setTimeout(() => setShowDateTime(true), originalUrlTypingDuration + 500)
     );
     timeouts.push(
-      setTimeout(() => setShowIcons([true, false, false]), originalUrlTypingDuration + 900)
+      setTimeout(
+        () => setShowIcons([true, false, false]),
+        originalUrlTypingDuration + 900
+      )
     );
     timeouts.push(
-      setTimeout(() => setShowIcons([true, true, false]), originalUrlTypingDuration + 1200)
+      setTimeout(
+        () => setShowIcons([true, true, false]),
+        originalUrlTypingDuration + 1200
+      )
     );
     timeouts.push(
-      setTimeout(() => setShowIcons([true, true, true]), originalUrlTypingDuration + 1500)
+      setTimeout(
+        () => setShowIcons([true, true, true]),
+        originalUrlTypingDuration + 1500
+      )
     );
 
-    const totalTimeForAllAnimations =
-      originalUrlTypingDuration + 1500 + 600;
+    const totalTimeForAllAnimations = originalUrlTypingDuration + 1500 + 600;
 
     timeouts.push(
       setTimeout(() => {
@@ -259,7 +288,9 @@ export default function CardContent({ start, onAnimationComplete }) {
           </a>
         </div>
 
-        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">{typedHeading}</h3>
+        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">
+          {typedHeading}
+        </h3>
 
         <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[420px]">
           {typedOriginalUrl}
