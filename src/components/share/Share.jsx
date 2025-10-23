@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-// --- ICONS CONFIGURATION ---
-const icons = [
+const iconsList = [
   { src: "/images/share/Copy Icon B.svg", platform: "copy" },
   { src: "/images/share/Share Icon B.svg", platform: "generic" },
   { src: "/images/share/ZIMOJI B.svg", platform: "zimoji" },
@@ -14,225 +13,84 @@ const icons = [
   { src: "/images/share/X B.svg", platform: "x" },
   { src: "/images/share/WeChat B.svg", platform: "wechat" },
   { src: "/images/share/Threads B.svg", platform: "threads" },
-  { src: "/images/share/BlueSky B.svg", platform: "bluesky" },
+  { src: "/images/share/BlueSky B.svg", platform: "BlueSky" },
   { src: "/images/share/Reddit B.svg", platform: "reddit" },
   { src: "/images/share/Discord B.svg", platform: "discord" },
   { src: "/images/share/Sina Weibo B.svg", platform: "weibo" },
   { src: "/images/share/Messenger B.svg", platform: "messenger" },
 ];
 
-export default function Share({ start = false, onAnimationComplete }) {
-  const scrollRef = useRef(null);
-  const [visibleIcons, setVisibleIcons] = useState([]);
-  const [showArrows, setShowArrows] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const hasAnimated = useRef(false);
+export default function Share({ start, onAnimationComplete }) {
+  const [scrollIndex, setScrollIndex] = useState(0);
+  const visibleCount = 9; // how many icons fit visible width
+  const maxIndex = Math.max(0, iconsList.length - visibleCount);
 
-  const shortUrl = "https://your-short-url.com"; // replace dynamically as needed
-
-  // --- SHARE HANDLER ---
-  const handleShare = async (platform) => {
-    const encodedUrl = encodeURIComponent(shortUrl);
-    let shareUrl = "";
-
-    switch (platform) {
-      case "copy":
-        try {
-          await navigator.clipboard.writeText(shortUrl);
-          console.log("✅ URL copied to clipboard");
-        } catch (err) {
-          console.error("❌ Copy failed:", err);
-        }
-        return;
-
-      case "email":
-        shareUrl = `mailto:?subject=Share WS by ZIMO&body=${encodedUrl}`;
-        break;
-      case "whatsapp":
-        shareUrl = `https://wa.me/?text=Share WS by ZIMO - ${encodedUrl}`;
-        break;
-      case "telegram":
-        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=Share WS by ZIMO`;
-        break;
-      case "x":
-        shareUrl = `https://twitter.com/intent/tweet?text=Share WS by ZIMO%0A${encodedUrl}`;
-        break;
-      case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-        break;
-      case "reddit":
-        shareUrl = `https://www.reddit.com/submit?url=${encodedUrl}&title=Share WS by ZIMO`;
-        break;
-      case "threads":
-        shareUrl = `https://www.threads.net/intent/post?text=Share WS by ZIMO%0A${encodedUrl}`;
-        break;
-      case "bluesky":
-        shareUrl = `https://bsky.app/intent/compose?text=Share WS by ZIMO%0A${encodedUrl}`;
-        break;
-      case "discord":
-        shareUrl = `https://discord.com/`;
-        break;
-      case "wechat":
-        shareUrl = `https://www.wechat.com/`;
-        break;
-      case "weibo":
-        shareUrl = `https://service.weibo.com/share/share.php?url=${encodedUrl}`;
-        break;
-      case "zimoji":
-        shareUrl = `https://zimoji.org`;
-        break;
-      case "omn":
-        shareUrl = `https://omnium.social/`;
-        break;
-      case "messenger":
-        shareUrl = `https://www.messenger.com/`;
-        break;
-      case "generic":
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: "Share WS by ZIMO",
-              text: `Share WS by ZIMO - ${shortUrl}`,
-              url: shortUrl,
-            });
-          } catch {
-            navigator.clipboard.writeText(shortUrl);
-          }
-        } else {
-          navigator.clipboard.writeText(shortUrl);
-        }
-        return;
-      default:
-        navigator.clipboard.writeText(shortUrl);
-        return;
-    }
-
-    window.open(shareUrl, "_blank");
+  const handleNext = () => {
+    setScrollIndex((prev) => (prev < maxIndex ? prev + 1 : prev));
+  };
+  const handlePrev = () => {
+    setScrollIndex((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
-  // --- ICONS APPEAR SEQUENTIALLY ---
-  useEffect(() => {
-    if (!start || hasAnimated.current) return;
-    hasAnimated.current = true;
-    setVisibleIcons([]);
-    setShowArrows(false);
-
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i >= icons.length) {
-        clearInterval(interval);
-        setTimeout(() => {
-          setShowArrows(true);
-          onAnimationComplete?.();
-        }, 600);
-        return;
-      }
-      setVisibleIcons((prev) => [...prev, icons[i]]);
-      i++;
-    }, 120);
-
-    return () => clearInterval(interval);
-  }, [start, onAnimationComplete]);
-
-  // --- RESET ON STOP ---
-  useEffect(() => {
-    if (!start) {
-      setVisibleIcons([]);
-      setShowArrows(false);
-      hasAnimated.current = false;
-    }
-  }, [start]);
-
-  // --- UPDATE SCROLL ARROWS ---
-  const updateScrollButtons = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 5);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 5);
-  };
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", updateScrollButtons);
-    window.addEventListener("resize", updateScrollButtons);
-    updateScrollButtons();
-    return () => {
-      el.removeEventListener("scroll", updateScrollButtons);
-      window.removeEventListener("resize", updateScrollButtons);
-    };
-  }, []);
-
-  // --- RECHECK WHEN ICONS LOAD ---
-  useEffect(() => {
-    updateScrollButtons();
-  }, [visibleIcons]);
-
-  // --- SCROLL ACTION ---
-  const handleScroll = (dir) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir === "right" ? 300 : -300, behavior: "smooth" });
-  };
-
-  // --- RENDER ---
   return (
-  <div className="relative flex flex-col items-center w-full">
-    {/* ICONS ROW */}
-    <div
-      ref={scrollRef}
-      className="flex gap-[25px] mx-[24px] mt-[29px] mb-[20px] overflow-x-auto scroll-smooth no-scrollbar"
+    <motion.div
+      className="flex flex-col items-center justify-center w-full py-4 space-y-2"
+      initial={{ opacity: 0, y: 30 }}
+      animate={start ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6 }}
+      onAnimationComplete={onAnimationComplete}
     >
-      {visibleIcons.map(({ src, platform }) => (
-        <motion.img
-          key={platform}
-          src={src}
-          alt={platform}
-          onClick={() => handleShare(platform)}
-          className="h-[25.52px] flex-shrink-0 cursor-pointer"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        />
-      ))}
-    </div>
-
-    {/* SCROLL ARROWS BELOW ICONS */}
-    {showArrows && (
-      <div className="w-full flex justify-between items-center mb-[28.5px] px-[24px]">
-        {/* LEFT ARROW */}
-        <motion.img
-          src="/images/share/Arrow Left B.svg"
-          alt="Scroll left"
-          className={`h-[25.52px] transition-opacity ${
-            canScrollLeft
-              ? "opacity-60 hover:opacity-100 cursor-pointer"
-              : "opacity-0"
-          }`}
-          onClick={() => canScrollLeft && handleScroll("left")}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: canScrollLeft ? 0.5 : 0 }}
-          transition={{ duration: 0.3 }}
-        />
-
-        {/* RIGHT ARROW */}
-        <motion.img
-          src="/images/share/Arrow Right B.svg"
-          alt="Scroll right"
-          className={`h-[25.52px] transition-opacity ${
-            canScrollRight
-              ? "opacity-60 hover:opacity-100 cursor-pointer"
-              : "opacity-0"
-          }`}
-          onClick={() => canScrollRight && handleScroll("right")}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: canScrollRight ? 0.5 : 0 }}
-          transition={{ duration: 0.3 }}
-        />
+      {/* --- ICONS ROW --- */}
+      <div className="overflow-hidden w-[460px]">
+        <motion.div
+          className="flex items-center gap-5"
+          animate={{ x: -scrollIndex * 52 }} // each icon + gap ≈ 52px
+          transition={{ type: "tween", duration: 0.4 }}
+        >
+          {iconsList.map((icon) => (
+            <motion.img
+              key={icon.platform}
+              src={icon.src}
+              alt={icon.platform}
+              className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-150"
+              whileTap={{ scale: 0.9 }}
+            />
+          ))}
+        </motion.div>
       </div>
-    )}
-  </div>
-);
 
+      {/* --- ARROWS BELOW --- */}
+      <div className="flex items-center justify-between mb-[28.5px] px-[24px]">
+        <button
+          onClick={handlePrev}
+          className={`p-1 transition-opacity ${
+            scrollIndex === 0
+              ? "opacity-0 cursor-default"
+              : "opacity-50 hover:opacity-100 "
+          }`}
+        >
+          <img
+            src="/images/share/Arrow Left B.svg"
+            alt="Left"
+            className="w-5 h-5"
+          />
+        </button>
+
+        <button
+          onClick={handleNext}
+          className={`p-1 transition-opacity ${
+            scrollIndex === maxIndex
+              ? "opacity-0 cursor-default"
+              : "opacity-50 hover:opacity-100"
+          }`}
+        >
+          <img
+            src="/images/share/Arrow Right B.svg"
+            alt="Right"
+            className="w-5 h-5"
+          />
+        </button>
+      </div>
+    </motion.div>
+  );
 }
