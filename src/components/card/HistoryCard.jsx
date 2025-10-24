@@ -135,13 +135,13 @@ function HistoryCard({
                 : "Delete"
             }
           />
-          <div className="flex gap-[5px] items-center">
+          <div className="flex items-center gap-[10px]">
             <img
               src="/images/card/Counter - URL Clicks.svg"
               alt="counter click"
               className="h-[22px]" // cursor-pointer hata diya agar clickable nahi hai
             />
-            <p>{clickCounter}</p>
+            <p className="text-[12px] tracking-[2px]">{clickCounter}</p>
           </div>
         </div>
       </div>

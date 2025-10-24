@@ -35,6 +35,7 @@ export default function CardContent({ start, onAnimationComplete }) {
   // ---------- Local States ----------
   const [originalUrl, setOriginalUrl] = useState("");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
   const [animationData, setAnimationData] = useState(null);
 
   const [showLine, setShowLine] = useState(false);
@@ -284,14 +285,11 @@ export default function CardContent({ start, onAnimationComplete }) {
               }
             />
           )}
-          <a
-            href={animationData?.shortUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <p
             className="text-[14px]"
           >
             {typedShortUrl}
-          </a>
+          </p>
         </div>
 
         {/* Title */}
@@ -333,15 +331,20 @@ export default function CardContent({ start, onAnimationComplete }) {
 
           {showIcons[1] && (
             <motion.img
+              key="copy-icon"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
               src="/images/card/Copy Icon B.svg"
               alt="copy"
-              className="h-[22px] cursor-pointer"
+              className={`h-[22px] cursor-pointer transition-all duration-200 ${
+                copied ? "opacity-60 scale-95" : "hover:scale-105"
+              }`}
               onClick={() => {
                 if (animationData?.shortUrl) {
                   navigator.clipboard.writeText(animationData.shortUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 800); // Reset state after 0.8s
                 }
               }}
             />

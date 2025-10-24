@@ -24,6 +24,7 @@ export default function Share({ start, onAnimationComplete }) {
   const shortUrl = useSelector((state) => state.shortUrl.shortUrl);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [iconsDone, setIconsDone] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const visibleCount = 9; // how many icons fit
   const iconWidth = 52; // width + gap approximation
@@ -155,9 +156,25 @@ export default function Share({ start, onAnimationComplete }) {
                 src={icon.src}
                 alt={icon.platform}
                 variants={iconVariants}
-                className="h-[25.52px] cursor-pointer transition-transform duration-150"
+                className={`h-[25.52px] cursor-pointer transition-all duration-200 ${
+                  icon.platform === "copy"
+                    ? copied
+                      ? "opacity-60 scale-95"
+                      : "hover:scale-105"
+                    : "hover:scale-105"
+                }`}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => handleShare(icon.platform)}
+                onClick={async () => {
+                  if (icon.platform === "copy") {
+                    if (shortUrl) {
+                      await navigator.clipboard.writeText(shortUrl);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 800); // reset animation
+                    }
+                  } else {
+                    handleShare(icon.platform);
+                  }
+                }}
               />
             ))}
           </motion.div>
