@@ -18,9 +18,10 @@ function HistoryCard({
   isCopied,
   isDeleting,
 }) {
-  // Local state aur handler remove kar diye gaye hain
-  // const [confirmDelete, setConfirmDelete] = useState(false);
-  // const handleDeleteClick = () => { ... };
+  const getDisplayUrl = (url) => {
+    if (!url) return "";
+    return url.replace(/^https?:\/\//, ""); // remove http:// or https://
+  };
 
   return (
     <motion.div
@@ -73,14 +74,12 @@ function HistoryCard({
             rel="noopener noreferrer"
             className="text-[14px]"
           >
-            {shortUrl}
+            {getDisplayUrl(shortUrl)}
           </a>
         </div>
 
         {/* Title */}
-        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">
-          {title}
-        </h3>
+        <h3 className="tracking-[1.5px] leading-[18px] pr-[20px]">{title}</h3>
 
         {/* Full Link */}
         <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]">
