@@ -285,11 +285,7 @@ export default function CardContent({ start, onAnimationComplete }) {
               }
             />
           )}
-          <p
-            className="text-[14px]"
-          >
-            {typedShortUrl}
-          </p>
+          <p className="text-[14px]">{typedShortUrl}</p>
         </div>
 
         {/* Title */}
@@ -298,9 +294,16 @@ export default function CardContent({ start, onAnimationComplete }) {
         </h3>
 
         {/* Original URL */}
-        <p className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]">
-          {typedOriginalUrl}
-        </p>
+        {startOriginalUrl && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="cursor-default whitespace-nowrap overflow-hidden text-ellipsis w-[440px]"
+          >
+            {animationData?.originalUrl}
+          </motion.p>
+        )}
 
         {/* Date & Time */}
         {showDateTime && (
