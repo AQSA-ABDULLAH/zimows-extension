@@ -1,11 +1,16 @@
-
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
-import { setShortUrlData, fetchUrlDetailsByAlias } from "../../store/features/shortUrlSlice"; // Removed unused imports
-import { updateHistoryItemClickCount, fetchHistory } from "../../store/features/historySlice";
-import { useCopyToClipboard } from '../../lib/useCopyToClipboard';
-// import { request_lamda4 } from '../../lib/services'; // This was imported in Sidebar but not used
+import {
+  setShortUrlData,
+  fetchUrlDetailsByAlias,
+} from "../../store/features/shortUrlSlice"; 
+import {
+  updateHistoryItemClickCount,
+  fetchHistory,
+  deleteHistory,
+} from "../../store/features/historySlice";
+import { useCopyToClipboard } from "../../lib/useCopyToClipboard";
 import HistoryCard from "./HistoryCard";
 
 // Ye component ab Sidebar ki tarah props lega
@@ -20,37 +25,42 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
   const allItems = useSelector((state) => state.history.items);
   const currentShortUrl = useSelector((state) => state.shortUrl.shortUrl);
   const currentClicksCount = useSelector((state) => state.shortUrl.clicksCount);
-  const { shortUrlId: selectedShortUrlId } = useSelector((state) => state.shortUrl);
+  const { shortUrlId: selectedShortUrlId } = useSelector(
+    (state) => state.shortUrl
+  );
   const { copyToClipboard } = useCopyToClipboard();
 
   // ✅ SYNC DISPLAYED ITEM'S COUNT - (Logic from Sidebar.js)
   useEffect(() => {
     if (currentShortUrl && currentClicksCount !== undefined) {
-      const currentAlias = currentShortUrl.split('/').pop();
-      const currentItem = allItems.find(item => {
-        const itemAlias = item.zimo_ws_url ? item.zimo_ws_url.split('/').pop() : null;
+      const currentAlias = currentShortUrl.split("/").pop();
+      const currentItem = allItems.find((item) => {
+        const itemAlias = item.zimo_ws_url
+          ? item.zimo_ws_url.split("/").pop()
+          : null;
         return itemAlias === currentAlias;
       });
-      
+
       if (currentItem && currentItem.clicks_count !== currentClicksCount) {
-        dispatch(updateHistoryItemClickCount({ 
-          shortUrlId: currentItem.short_url_id, 
-          clicksCount: currentClicksCount 
-        }));
+        dispatch(
+          updateHistoryItemClickCount({
+            shortUrlId: currentItem.short_url_id,
+            clicksCount: currentClicksCount,
+          })
+        );
       }
     }
   }, [currentClicksCount, currentShortUrl, allItems, dispatch]);
 
   useEffect(() => {
-      if (!visitorId) {
-    console.log("⚠️ No visitorId found, skipping history fetch");
-    return;
-  }
-  if (!visitorId) return;
-  console.log("🔁 Fetching history for:", visitorId);
-  dispatch(fetchHistory(visitorId));
-}, [visitorId, dispatch]);
-
+    if (!visitorId) {
+      console.log("⚠️ No visitorId found, skipping history fetch");
+      return;
+    }
+    if (!visitorId) return;
+    console.log("🔁 Fetching history for:", visitorId);
+    dispatch(fetchHistory(visitorId));
+  }, [visitorId, dispatch]);
 
   // Set up 3-second interval to refresh history data - (Logic from Sidebar.js)
   useEffect(() => {
@@ -78,9 +88,9 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
     if (url) {
       const success = await copyToClipboard(url);
       if (success) {
-        setCopiedItems(prev => new Set([...prev, itemId]));
+        setCopiedItems((prev) => new Set([...prev, itemId]));
         setTimeout(() => {
-          setCopiedItems(prev => {
+          setCopiedItems((prev) => {
             const newSet = new Set(prev);
             newSet.delete(itemId);
             return newSet;
@@ -95,9 +105,9 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
     if (!url) return null;
     try {
       const u = new URL(url);
-      return u.pathname.split('/').filter(Boolean).pop();
+      return u.pathname.split("/").filter(Boolean).pop();
     } catch {
-      return url.split('/').filter(Boolean).pop();
+      return url.split("/").filter(Boolean).pop();
     }
   };
 
@@ -115,11 +125,14 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
 
   // Derive ordered list - (Logic from Sidebar.js)
   const orderedItems = useMemo(() => {
-    const list = dedupeByAlias(allItems || [])
-      .filter(item => !pendingDeleteIds.has(item.short_url_id));
+    const list = dedupeByAlias(allItems || []).filter(
+      (item) => !pendingDeleteIds.has(item.short_url_id)
+    );
     if (!selectedAlias) return list;
 
-    const idx = list.findIndex(i => getAlias(i.zimo_ws_url) === selectedAlias);
+    const idx = list.findIndex(
+      (i) => getAlias(i.zimo_ws_url) === selectedAlias
+    );
     if (idx <= 0) return list;
     return [list[idx], ...list.slice(0, idx), ...list.slice(idx + 1)];
   }, [allItems, selectedAlias, pendingDeleteIds]);
@@ -157,23 +170,24 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
       if (!visitorId) return console.warn("Missing visitorId");
 
       setIsDeleting(true);
-      
+
       if (shortUrlId === selectedShortUrlId) {
         handleReset?.(); // Reset main view if current item is deleted
       }
 
-      setPendingDeleteIds(prev => new Set(prev).add(shortUrlId)); // Optimistic UI
+      setPendingDeleteIds((prev) => new Set(prev).add(shortUrlId)); // Optimistic UI
 
       try {
-        await onDelete({ shortUrlId, visitorId }); // Call API prop
+        // ✅ Dispatch Redux thunk to delete item (optimistic + backend)
+        await dispatch(deleteHistory({ shortUrlId, visitorId })).unwrap();
       } catch (error) {
         console.error("Delete failed:", error);
       } finally {
         setDeleteConfirm(null);
         setIsDeleting(false);
-        // We don't need to restore state, polling will fix it
       }
     } else {
+      // Ask for delete confirmation
       setDeleteConfirm(shortUrlId);
       setTimeout(() => {
         setDeleteConfirm((prev) => (prev === shortUrlId ? null : prev));
@@ -188,12 +202,12 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
       text: `Share WS by ZIMO - ${item.zimo_ws_url}`,
       url: item.zimo_ws_url,
     };
-  
+
     if (navigator.share) {
       try {
         await navigator.share(shareData);
       } catch (error) {
-        console.error('Sharing failed:', error);
+        console.error("Sharing failed:", error);
         await copyToClipboard(item.zimo_ws_url); // Fallback to copy
       }
     } else {
@@ -206,8 +220,8 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
     <div>
       <AnimatePresence mode="popLayout">
         {orderedItems.map((item) => {
-           const alias = getAlias(item.zimo_ws_url);
-           return (
+          const alias = getAlias(item.zimo_ws_url);
+          return (
             <HistoryCard
               key={alias} // Use stable alias as key
               id={item.short_url_id}
@@ -218,20 +232,20 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
               time={item.time}
               date={item.date}
               clickCounter={item.clicks_count?.toLocaleString() ?? 0}
-              
               // Pass handlers from this component
               onDeleteClick={() => handleDeleteClick(item.short_url_id)}
-              onCopyClick={() => handleCopy(item.zimo_ws_url, item.short_url_id)}
+              onCopyClick={() =>
+                handleCopy(item.zimo_ws_url, item.short_url_id)
+              }
               onShareClick={() => handleShare(item)}
               onShowResultClick={() => handleShowShortenedResult(item)}
-
               // Pass UI state
               isConfirmingDelete={deleteConfirm === item.short_url_id}
               isCopied={copiedItems.has(item.short_url_id)}
               isDeleting={isDeleting}
               // isSelected={isSelected(item)} // Aap isSelected prop use kar saktay hain agar selected item ko highlight karna ho
             />
-           );
+          );
         })}
       </AnimatePresence>
     </div>
