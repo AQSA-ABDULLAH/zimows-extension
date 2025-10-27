@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShortUrl } from "../../store/features/shortUrlSlice";
 import { addHistoryItem } from "../../store/features/historySlice";
+import { fetchExtensionDetails } from "../../store/features/extensionDetailsSlice";
 
 // -------------------- ✨ Typing Effect Hook --------------------
 function useTypingEffect(text, delay = 40, start = true) {
@@ -328,7 +329,15 @@ export default function CardContent({ start, onAnimationComplete }) {
               src="/images/card/Open in New Window.svg"
               alt="open"
               className="h-[22px] cursor-pointer"
-              onClick={() => window.open(animationData?.shortUrl, "_blank")}
+              onClick={() => {
+                if (animationData?.shortUrl) {
+                  const alias = animationData.shortUrl.split("/").pop(); // e.g. "nakf6O"
+                  console.log("Extracted alias:", alias);
+
+                  // Open zimo.ws with alias as query param
+                  window.open(`https://zimo.ws/?alias=${alias}`, "_blank");
+                }
+              }}
             />
           )}
 

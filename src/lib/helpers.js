@@ -623,6 +623,34 @@ const getUrlDetailsByAlias = async (alias) => {
   }
 };
 
+
+/**
+ * Fetch details for a short URL alias (for Chrome Extension WS)
+ * @param {string} alias - The short URL alias
+ * @returns {object} - Response data from the API
+ */
+const getExtensionDetails = async (alias) => {
+  try {
+    if (!alias) throw new Error("Alias is required");
+
+    const response = await fetch(
+      `https://backend-zimo-ws-213279879410.europe-west1.run.app/api/extension-ws-url-details?alias=${alias}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch extension details (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log("🔍 Extension details response:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching extension details:", error.message || error);
+    throw error;
+  }
+};
+
+
 export {
   getUserLocation,
   getVisitor,
@@ -631,5 +659,6 @@ export {
   shortenUrl,
   deleteHistory,
   getRedirect,
-  getUrlDetailsByAlias
+  getUrlDetailsByAlias,
+  getExtensionDetails
 };
