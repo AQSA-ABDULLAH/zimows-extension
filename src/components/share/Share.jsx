@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
 const iconsList = [
+   { src: "/images/share/Share Icon B.svg", platform: "generic" },
   { src: "/images/share/Copy Icon B.svg", platform: "copy" },
-  { src: "/images/share/Share Icon B.svg", platform: "generic" },
   { src: "/images/share/ZIMOJI B.svg", platform: "zimoji" },
   { src: "/images/share/OMN B.svg", platform: "omn" },
   { src: "/images/share/Email B.svg", platform: "email" },
