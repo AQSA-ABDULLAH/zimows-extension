@@ -126,7 +126,7 @@ function HistoryCard({
             alt="delete"
             className={`h-[22px] cursor-pointer transition-all duration-300 ease-in-out transform ${
               isConfirmingDelete ? "scale-110" : "scale-100" // State from prop
-            } ${isDeleting ? "opacity-50 pointer-events-none" : "opacity-100"}`} // State from prop
+            } ${isDeleting ? "pointer-events-none" : ""}`} // State from prop
             onClick={onDeleteClick} // Prop se handler
             title={
               isConfirmingDelete // State from prop

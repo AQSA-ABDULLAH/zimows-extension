@@ -222,23 +222,24 @@ export default function CardContent({ start, onAnimationComplete }) {
   }, [startShortUrl, animationData]);
 
   // -------------------- ⏱️ Show Date, Time & Icons --------------------
-  useEffect(() => {
-    if (!startOriginalUrl || !animationData) return;
-    if (showDateTime || showIcons.includes(true)) return; // prevent re-trigger
+ useEffect(() => {
+  if (!startOriginalUrl || !animationData) return;
+  if (showDateTime || showIcons.includes(true)) return;
 
-    const duration = (animationData.originalUrl?.length || 0) * 25;
-    const timeouts = [];
+  const timeouts = [];
 
-    timeouts.push(
-      setTimeout(() => setShowDateTime(true), duration + 500),
-      setTimeout(() => setShowIcons([true, false, false]), duration + 900),
-      setTimeout(() => setShowIcons([true, true, false]), duration + 1200),
-      setTimeout(() => setShowIcons([true, true, true]), duration + 1500),
-      setTimeout(() => onAnimationComplete?.(), duration + 2100)
-    );
+  // Show date/time quickly after URL starts
+  timeouts.push(setTimeout(() => setShowDateTime(true), 600));
 
-    return () => timeouts.forEach(clearTimeout);
-  }, [startOriginalUrl, animationData]);
+  // Show icons soon after
+  timeouts.push(setTimeout(() => setShowIcons([true, false, false]), 900));
+  timeouts.push(setTimeout(() => setShowIcons([true, true, false]), 1200));
+  timeouts.push(setTimeout(() => setShowIcons([true, true, true]), 1500));
+  timeouts.push(setTimeout(() => onAnimationComplete?.(), 2000));
+
+  return () => timeouts.forEach(clearTimeout);
+}, [startOriginalUrl, animationData]);
+
 
   // -------------------- ❌ Error UI --------------------
   if (error) {
