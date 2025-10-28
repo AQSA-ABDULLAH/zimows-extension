@@ -198,8 +198,8 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
   // Handle Share - (Logic from Sidebar.js)
   const handleShare = async (item) => {
     const shareData = {
-      title: "Share WS by ZIMO",
-      text: `Share WS by ZIMO - ${item.zimo_ws_url}`,
+      title: "WS by ZIMO",
+      text: `WS by ZIMO - ${item.zimo_ws_url}`,
       url: item.zimo_ws_url,
     };
 

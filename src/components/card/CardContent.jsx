@@ -374,7 +374,7 @@ export default function CardContent({ start, onAnimationComplete }) {
               onClick={() => {
                 if (navigator.share && animationData?.shortUrl) {
                   navigator.share({
-                    title: "Check this link!",
+                    title: "WS by Zimo",
                     url: animationData.shortUrl,
                   });
                 } else if (animationData?.shortUrl) {

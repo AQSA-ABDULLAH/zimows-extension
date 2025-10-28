@@ -86,8 +86,8 @@ export default function Share({ start, onAnimationComplete }) {
         if (navigator.share) {
           try {
             await navigator.share({
-              title: "Share WS by ZIMO",
-              text: `Share WS by ZIMO - ${shortUrl}`,
+              title: "WS by ZIMO",
+              text: `WS by ZIMO - ${shortUrl}`,
               url: shortUrl,
             });
           } catch {
