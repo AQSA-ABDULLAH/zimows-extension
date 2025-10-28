@@ -1,22 +1,25 @@
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { request_lamda1, request_lamda2, request_lamda3, request_lamda4 } from "./services";
+import {
+  request_lamda1,
+  request_lamda2,
+  request_lamda3,
+  request_lamda4,
+} from "./services";
 import { CUSTOM_DESC_API } from "./constants";
-
 
 // Conditional logging helper
 const log = (...args) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.log(...args);
   }
 };
 
 const logError = (...args) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.error(...args);
   }
 };
-
 
 // @returns {latitude, longitude} - Non-blocking with timeout
 const getUserLocation = () => {
@@ -77,7 +80,6 @@ const getVisitor = async (lat = null, lng = null) => {
   }
 };
 
-
 /**
  * Fetches metadata (title, description, favicon, etc.) from the backend API for a given URL.
  * @param {string} longUrl - The URL to extract metadata from
@@ -85,45 +87,97 @@ const getVisitor = async (lat = null, lng = null) => {
  */
 const getMetadata = async (longUrl) => {
   try {
-    console.log('🔍 Fetching metadata for:', longUrl);
-    
-    // 0) Database search first (highest priority)
+    console.log("🔍 Fetching metadata for:", longUrl);
+
+    // 0) Database search first (highest priority) - Check if record exists in our DB
     let dbMetadata = null;
     try {
-      if (CUSTOM_DESC_API && typeof CUSTOM_DESC_API === 'string' && CUSTOM_DESC_API.trim().length > 0) {
+      if (
+        CUSTOM_DESC_API &&
+        typeof CUSTOM_DESC_API === "string" &&
+        CUSTOM_DESC_API.trim().length > 0
+      ) {
         const originalUrlParam = encodeURIComponent(longUrl);
         const searchUrl = `${CUSTOM_DESC_API}?original_url=${originalUrlParam}`;
-        
-        console.log('🔍 Searching database for existing record:', searchUrl);
+
+        console.log("🔍 Searching database for existing record:", searchUrl);
         const searchRes = await fetch(searchUrl, {
-          method: 'GET',
-          headers: { 'api-key': '2@w6g!!5' },
+          method: "GET",
+          headers: { "api-key": "2@w6g!!5" },
           timeout: 5000,
         });
 
         const searchData = await searchRes.json();
-        console.log('📋 Database search response status:', searchRes.status);
-        console.log('📋 Database search response data:', searchData);
-        
+        console.log("📋 Database search response status:", searchRes.status);
+        console.log("📋 Database search response data:", searchData);
+
         if (searchRes.ok && searchData && !searchData.error) {
+          // Check if we found a record in the database
           let record = null;
 
-          if (searchData.data && Array.isArray(searchData.data) && searchData.data.length > 0) {
+          // Case 1: Response has data array
+          if (
+            searchData.data &&
+            Array.isArray(searchData.data) &&
+            searchData.data.length > 0
+          ) {
             record = searchData.data[0];
-          } else if (searchData.data && typeof searchData.data === 'object' && !Array.isArray(searchData.data)) {
+          }
+          // Case 2: Response has direct record object
+          else if (
+            searchData.data &&
+            typeof searchData.data === "object" &&
+            !Array.isArray(searchData.data)
+          ) {
             record = searchData.data;
-          } else if (searchData && typeof searchData === 'object' && !searchData.error && !searchData.data) {
+          }
+          // Case 3: Response is the record itself
+          else if (
+            searchData &&
+            typeof searchData === "object" &&
+            !searchData.error &&
+            !searchData.data
+          ) {
             record = searchData;
           }
-          
+
           if (record) {
-            console.log('✅ Found existing record in database:', record);
-            
+            console.log("✅ Found existing record in database:", record);
+
+            // Console log media file from search API
+            if (record.media_url) {
+              console.log("🎬 Media file from search API:", record.media_url);
+            } else {
+              console.log("⚠️ Media URL is empty in search API response");
+            }
+
+            // Prioritize media_url over image fields
+            let mediaUrl = "";
+            if (record.media_url && record.media_url.trim() !== "") {
+              mediaUrl = record.media_url;
+              console.log("🎬 Using media_url from database:", mediaUrl);
+            } else {
+              // Fallback to image fields if no media_url
+              mediaUrl =
+                record.meta_image ||
+                record.on_image ||
+                record.og_image ||
+                record.image ||
+                "";
+              console.log(
+                "🖼️ Using image fields from database (media_url was empty):",
+                mediaUrl
+              );
+            }
+
+            // Return the database record metadata
             return {
               faviconUrl:
                 record.favicon_url ||
                 record.favicon ||
-                `https://www.google.com/s2/favicons?sz=64&domain=${new URL(longUrl).hostname}`,
+                `https://www.google.com/s2/favicons?sz=64&domain=${
+                  new URL(longUrl).hostname
+                }`,
               metaTitle:
                 record.meta_title ||
                 record.title ||
@@ -132,72 +186,104 @@ const getMetadata = async (longUrl) => {
                 record.meta_description ||
                 record.description ||
                 `Visit ${new URL(longUrl).hostname} for more information.`,
+              onImage: mediaUrl,
             };
           } else {
-            console.log('ℹ️ No existing record found in database, proceeding with metadata extraction');
+            console.log(
+              "ℹ️ No existing record found in database, proceeding with metadata extraction"
+            );
           }
         } else {
           if (searchData && searchData.error) {
-            console.log('ℹ️ Database search returned error:', searchData.message, 'proceeding with metadata extraction');
+            console.log(
+              "ℹ️ Database search returned error:",
+              searchData.message,
+              "proceeding with metadata extraction"
+            );
           } else {
-            console.log('⚠️ Database search failed with status:', searchRes.status, 'proceeding with metadata extraction');
+            console.log(
+              "⚠️ Database search failed with status:",
+              searchRes.status,
+              "proceeding with metadata extraction"
+            );
           }
         }
       }
     } catch (e) {
-      logError('Database search failed:', e.message);
-      console.log('⚠️ Database search error, proceeding with metadata extraction');
+      logError("Database search failed:", e.message);
+      console.log(
+        "⚠️ Database search error, proceeding with metadata extraction"
+      );
     }
 
-    // 1) Custom description override
+    // 1) Custom description override (fallback if no DB record found)
     let customDescription = "";
     try {
-      if (CUSTOM_DESC_API && typeof CUSTOM_DESC_API === 'string' && CUSTOM_DESC_API.trim().length > 0) {
+      if (
+        CUSTOM_DESC_API &&
+        typeof CUSTOM_DESC_API === "string" &&
+        CUSTOM_DESC_API.trim().length > 0
+      ) {
         const originalUrlParam = encodeURIComponent(longUrl);
         const customUrl = `${CUSTOM_DESC_API}?original_url=${originalUrlParam}`;
         const descRes = await fetch(customUrl, {
-          method: 'GET',
-          headers: { 'api-key': '2@w6g!!5' },
+          method: "GET",
+          headers: { "api-key": "2@w6g!!5" },
           timeout: 5000,
         });
-        let descData = null;
-        try { descData = await descRes.json(); } catch {}
+        {
+          // Parse JSON even if status is non-2xx; backend may still return useful fields
+          let descData = null;
+          try {
+            descData = await descRes.json();
+          } catch {}
 
-        let candidateDesc =
-          descData?.data?.meta_description ||
-          descData?.meta_description ||
-          descData?.description ||
-          "";
-
-        if (!candidateDesc || candidateDesc.trim().length === 0) {
-          const candidateTitle =
-            descData?.data?.meta_title ||
-            descData?.meta_title ||
-            descData?.title ||
+          let candidateDesc =
+            descData?.data?.meta_description ||
+            descData?.meta_description ||
+            descData?.description ||
             "";
-          if (typeof candidateTitle === 'string' && candidateTitle.trim().length > 0) {
-            candidateDesc = candidateTitle;
-          }
-        }
 
-        if (typeof candidateDesc === 'string' && candidateDesc.trim().length > 0) {
-          customDescription = candidateDesc;
+          // If no description found, fall back to title fields as description
+          if (!candidateDesc || candidateDesc.trim().length === 0) {
+            const candidateTitle =
+              descData?.data?.meta_title ||
+              descData?.meta_title ||
+              descData?.title ||
+              "";
+            if (
+              typeof candidateTitle === "string" &&
+              candidateTitle.trim().length > 0
+            ) {
+              candidateDesc = candidateTitle;
+            }
+          }
+
+          if (
+            typeof candidateDesc === "string" &&
+            candidateDesc.trim().length > 0
+          ) {
+            customDescription = candidateDesc;
+          }
         }
       }
     } catch (e) {
-      logError('Custom description API failed:', e.message);
+      logError("Custom description API failed:", e.message);
     }
 
-    // 2) Use Lambda API for metadata extraction
-    const lambdaUrl = 'https://w4eoer7wo5butpzqjysfqmfcby0bbvjo.lambda-url.eu-west-2.on.aws';
-    
+    // Use the new Lambda API for metadata extraction
+    const lambdaUrl =
+      "https://w4eoer7wo5butpzqjysfqmfcby0bbvjo.lambda-url.eu-west-2.on.aws";
+
     const response = await fetch(lambdaUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: longUrl }),
-      timeout: 10000
+      body: JSON.stringify({
+        url: longUrl,
+      }),
+      timeout: 10000,
     });
 
     if (!response.ok) {
@@ -205,37 +291,99 @@ const getMetadata = async (longUrl) => {
     }
 
     const data = await response.json();
-    console.log('📋 Lambda API response:', data);
+    console.log("📋 Lambda API response:", data);
 
     const domain = new URL(longUrl).hostname;
     const fallbackFavicon = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
 
+    // Extract title from Lambda API response
     const title = data.title || data.metaTitle || `${domain} - Page`;
+
+    // Extract description with priority: custom > lambda
     const description =
       customDescription ||
       data.description ||
       data.metaDescription ||
       `Visit ${domain} for more information and content.`;
 
+    // Extract image from Lambda API response
+    let image = "";
+
+    // Priority order for image selection
+    if (data.thumbnails && data.thumbnails.medium) {
+      image = data.thumbnails.medium.url;
+    } else if (data.thumbnails && data.thumbnails.default) {
+      image = data.thumbnails.default.url;
+    } else if (
+      data.og_tags &&
+      data.og_tags.image &&
+      data.og_tags.image.startsWith("http")
+    ) {
+      image = data.og_tags.image;
+    } else if (
+      data.twitter_tags &&
+      data.twitter_tags["image:src"] &&
+      data.twitter_tags["image:src"].startsWith("http")
+    ) {
+      image = data.twitter_tags["image:src"];
+    } else if (data.ogImage && data.ogImage.startsWith("http")) {
+      image = data.ogImage;
+    } else if (data.image && data.image.startsWith("http")) {
+      image = data.image;
+    } else if (data.thumbnails && data.thumbnails.high) {
+      image = data.thumbnails.high.url;
+    } else if (data.thumbnails && data.thumbnails.low) {
+      image = data.thumbnails.low.url;
+    }
+
+    // For YouTube videos, use high-quality thumbnail
+    if (longUrl.includes("youtube.com") && data.thumbnails) {
+      if (data.thumbnails.high) {
+        image = data.thumbnails.high.url;
+      } else if (data.thumbnails.medium) {
+        image = data.thumbnails.medium.url;
+      } else if (data.thumbnails.default) {
+        image = data.thumbnails.default.url;
+      }
+    }
+
+    // If no meaningful image found, don't use favicon as fallback
+    // This prevents showing favicons as post images
+    if (
+      !image ||
+      image.includes("favicon") ||
+      image.includes("google.com/s2/favicons")
+    ) {
+      image = "";
+    }
+
     console.log("🔍 Enhanced metadata extraction:", {
       originalUrl: longUrl,
       title: title,
-      description: description?.substring(0, 100) + '...',
+      description: description?.substring(0, 100) + "...",
+      image: image,
+      hasThumbnails: !!data.thumbnails,
+      thumbnailCount: data.thumbnails ? Object.keys(data.thumbnails).length : 0,
+      imageSource: image ? "Lambda API" : "No image found",
     });
-    
-    return {
+
+    const result = {
       faviconUrl: fallbackFavicon,
       metaTitle: title,
       metaDescription: description,
+      onImage: image,
     };
+
+    return result;
   } catch (err) {
     logError("❌ Error fetching metadata from Lambda API:", err.message);
-    
-    if (err.message.includes('404') || err.message.includes('Not Found')) {
+
+    // Check if it's a 404 or similar error
+    if (err.message.includes("404") || err.message.includes("Not Found")) {
       console.log("⚠️ URL appears to be invalid or no longer exists:", longUrl);
     }
 
-    // Fallback to old method
+    // Fallback to old method if Lambda API fails
     try {
       const encodedUrl = encodeURIComponent(longUrl);
       const res = await fetch(`/api/metadata?url=${encodedUrl}`);
@@ -244,67 +392,133 @@ const getMetadata = async (longUrl) => {
       const domain = new URL(longUrl).hostname;
       const fallbackFavicon = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
 
+      // Select the best favicon from available options
       const getBestFavicon = (favicons) => {
         if (!favicons || favicons.length === 0) return fallbackFavicon;
+
+        // Priority order: apple-touch-icon > 32x32 png > 16x16 png > any icon
         const priorities = [
-          (f) => f.rel === 'apple-touch-icon' && f.sizes === '180x180',
-          (f) => f.rel === 'icon' && f.sizes === '32x32' && f.type === 'image/png',
-          (f) => f.rel === 'icon' && f.sizes === '16x16' && f.type === 'image/png',
-          (f) => f.rel === 'apple-touch-icon',
-          (f) => f.rel === 'icon' && f.type === 'image/png',
-          (f) => f.rel === 'icon',
+          (f) => f.rel === "apple-touch-icon" && f.sizes === "180x180",
+          (f) =>
+            f.rel === "icon" && f.sizes === "32x32" && f.type === "image/png",
+          (f) =>
+            f.rel === "icon" && f.sizes === "16x16" && f.type === "image/png",
+          (f) => f.rel === "apple-touch-icon",
+          (f) => f.rel === "icon" && f.type === "image/png",
+          (f) => f.rel === "icon",
         ];
+
         for (const priority of priorities) {
           const favicon = favicons.find(priority);
           if (favicon && favicon.href) return favicon.href;
         }
+
         return favicons[0]?.href || fallbackFavicon;
       };
 
       const selectedFavicon = getBestFavicon(data.favicons);
 
+      // Extract the best image for rich link previews
+      const getBestImage = () => {
+        // Priority: og:image > twitter:image > first image
+        if (
+          data.ogImage &&
+          data.ogImage.trim() &&
+          data.ogImage.startsWith("http")
+        )
+          return data.ogImage;
+        if (
+          data.og_image &&
+          data.og_image.trim() &&
+          data.og_image.startsWith("http")
+        )
+          return data.og_image;
+        if (
+          data.twitterImage &&
+          data.twitterImage.trim() &&
+          data.twitterImage.startsWith("http")
+        )
+          return data.twitterImage;
+        if (
+          data.twitter_image &&
+          data.twitter_image.trim() &&
+          data.twitter_image.startsWith("http")
+        )
+          return data.twitter_image;
+        if (data.image && data.image.trim() && data.image.startsWith("http"))
+          return data.image;
+
+        // Don't use favicon as fallback for post images
+        return "";
+      };
+
+      const bestImage = getBestImage();
+
       console.log("🔍 Fallback metadata extraction:", {
         originalUrl: longUrl,
+        ogImage: data.ogImage,
+        og_image: data.og_image,
+        twitterImage: data.twitterImage,
+        twitter_image: data.twitter_image,
+        image: data.image,
         selectedFavicon: selectedFavicon,
+        bestImage: bestImage,
+        hasValidImage: !!bestImage && bestImage.startsWith("http"),
       });
-      
-      return {
+
+      const result = {
         faviconUrl: selectedFavicon,
         metaTitle: data.title || data.metaTitle || "",
-        metaDescription: data.description || "",
+        // Priority still respects custom description if available
+        metaDescription:  data.description || "",
+        onImage: bestImage,
       };
+
+      return result;
     } catch (fallbackErr) {
-      logError("❌ Fallback metadata extraction also failed:", fallbackErr.message);
+      logError(
+        "❌ Fallback metadata extraction also failed:",
+        fallbackErr.message
+      );
       const domain = new URL(longUrl).hostname;
       return {
         faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${domain}`,
         metaTitle: `${domain} - Page`,
         metaDescription: `Visit ${domain} for more information and content.`,
+        onImage: "", // Don't use favicon as post image
       };
     }
   }
 };
 
-
 // Performance monitoring utility
 const performanceMetrics = {
   metadataExtraction: [],
   urlShortening: [],
-  totalTime: []
+  totalTime: [],
 };
 
 const logPerformance = (operation, duration) => {
   performanceMetrics[operation].push(duration);
-  
+
   // Keep only last 100 measurements
   if (performanceMetrics[operation].length > 100) {
     performanceMetrics[operation].shift();
   }
-  
+
   // Log average performance every 10 operations
   if (performanceMetrics[operation].length % 10 === 0) {
-    const avg = performanceMetrics[operation].reduce((a, b) => a + b, 0) / performanceMetrics[operation].length;
-    console.log(`📊 ${operation} average time: ${avg.toFixed(2)}ms (last 10: ${performanceMetrics[operation].slice(-10).map(t => t.toFixed(0)).join(', ')}ms)`);
+    const avg =
+      performanceMetrics[operation].reduce((a, b) => a + b, 0) /
+      performanceMetrics[operation].length;
+    console.log(
+      `📊 ${operation} average time: ${avg.toFixed(
+        2
+      )}ms (last 10: ${performanceMetrics[operation]
+        .slice(-10)
+        .map((t) => t.toFixed(0))
+        .join(", ")}ms)`
+    );
   }
 };
 
@@ -322,13 +536,13 @@ const generateFallbackUrl = (originalUrl) => {
     zimo_ws_url: `https://zimo.ws/${wsAlias}`,
     short_url_id: `ws-${timestamp}`,
     original_url: originalUrl,
-    is_fallback: true
+    is_fallback: true,
   };
 };
 
 const shortenUrl = async (longUrl, visitorId) => {
   const startTime = Date.now();
-  
+
   if (!visitorId) {
     logError("❌ visitor_id is missing from Redux");
     throw new Error("Missing visitor ID");
@@ -338,16 +552,16 @@ const shortenUrl = async (longUrl, visitorId) => {
     // Step 1: Get metadata with timeout and fallback
     let metadata = {};
     const metadataStart = Date.now();
-    
+
     try {
       // Use Promise.race to add timeout to metadata extraction
       const metadataPromise = getMetadata(longUrl);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Metadata extraction timeout')), 6000)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Metadata extraction timeout")), 6000)
       );
-      
+
       metadata = await Promise.race([metadataPromise, timeoutPromise]);
-      logPerformance('metadataExtraction', Date.now() - metadataStart);
+      logPerformance("metadataExtraction", Date.now() - metadataStart);
     } catch (err) {
       logError("❌ getMetadata() failed, using fallback:", err.message || err);
       // Generate fallback metadata
@@ -357,14 +571,15 @@ const shortenUrl = async (longUrl, visitorId) => {
           faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${domain}`,
           metaTitle: `${domain} - Page`,
           metaDescription: `Visit ${domain} for more information and content.`,
-          onImage: '', // Don't use favicon as post image
+          onImage: "", // Don't use favicon as post image
         };
       } catch (urlError) {
         metadata = {
           faviconUrl: "/assets/default-favicon.png",
           metaTitle: "Web Page",
-          metaDescription: "Visit this webpage for more information and content.",
-          onImage: '', // Don't use default image as post image
+          metaDescription:
+            "Visit this webpage for more information and content.",
+          onImage: "", // Don't use default image as post image
         };
       }
     }
@@ -379,7 +594,9 @@ const shortenUrl = async (longUrl, visitorId) => {
 
     // Step 2: Prepare payload with optimized data
     const maxMetaDescriptionLength = 500;
-    let finalDescription = (metaDescription || description)?.slice(0, maxMetaDescriptionLength) || "";
+    let finalDescription =
+      (metaDescription || description)?.slice(0, maxMetaDescriptionLength) ||
+      "";
     // Ensure we always have something meaningful: if description empty but title exists, use title
     if (!finalDescription || finalDescription.trim().length === 0) {
       if (metaTitle && metaTitle.trim().length > 0) {
@@ -404,21 +621,21 @@ const shortenUrl = async (longUrl, visitorId) => {
       meta_title: metaTitle?.substring(0, 30) + "...",
       has_description: !!finalDescription,
       has_image: !!onImage,
-      visitor_id: visitorId
+      visitor_id: visitorId,
     });
 
     // Step 3: Send to backend with timeout
     const backendStart = Date.now();
-    
+
     try {
       const response = await Promise.race([
         request_lamda4.post("/api/url/shorten", payload),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Backend request timeout')), 8000)
-        )
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Backend request timeout")), 8000)
+        ),
       ]);
-      
-      logPerformance('urlShortening', Date.now() - backendStart);
+
+      logPerformance("urlShortening", Date.now() - backendStart);
 
       // Step 4: Handle response with detailed debugging
       console.log("🔍 Backend response received:", {
@@ -426,21 +643,21 @@ const shortenUrl = async (longUrl, visitorId) => {
         statusText: response?.statusText,
         hasData: !!response?.data,
         dataType: typeof response?.data,
-        dataKeys: response?.data ? Object.keys(response?.data) : 'no data'
+        dataKeys: response?.data ? Object.keys(response?.data) : "no data",
       });
 
       const data = response?.data;
-      
+
       // Check for various response formats
       if (!data) {
         throw new Error("Backend returned no data");
       }
-      
+
       // Handle different response structures
       let shortUrl = null;
       let shortUrlId = null;
       let originalUrl = null;
-      
+
       if (data.zimo_ws_url) {
         shortUrl = data.zimo_ws_url;
         shortUrlId = data.short_url_id;
@@ -454,24 +671,27 @@ const shortenUrl = async (longUrl, visitorId) => {
         shortUrlId = data.short_url_id;
         originalUrl = data.original_url;
       } else {
-        console.error("❌ Unexpected response structure:", JSON.stringify(data, null, 2));
+        console.error(
+          "❌ Unexpected response structure:",
+          JSON.stringify(data, null, 2)
+        );
         throw new Error("Backend response missing required fields");
       }
-      
+
       if (!shortUrl) {
         throw new Error("No shortened URL found in response");
       }
 
       const totalTime = Date.now() - startTime;
-      logPerformance('totalTime', totalTime);
-      
+      logPerformance("totalTime", totalTime);
+
       log("✅ URL shortened successfully:", {
         url: shortUrl,
         totalTime: `${totalTime}ms`,
         metadataTime: `${Date.now() - metadataStart}ms`,
-        backendTime: `${Date.now() - backendStart}ms`
+        backendTime: `${Date.now() - backendStart}ms`,
       });
-      
+
       // Return data in expected format
       return {
         data: {
@@ -484,31 +704,30 @@ const shortenUrl = async (longUrl, visitorId) => {
           favicon_url: data.favicon_url || faviconUrl,
           meta_image: data.meta_image || onImage,
           on_image: data.on_image || onImage,
-          clicks_count: data.clicks_count || 0
-        }
+          clicks_count: data.clicks_count || 0,
+        },
       };
-      
     } catch (backendError) {
       console.error("❌ Backend request failed:", {
         error: backendError.message,
         status: backendError.response?.status,
         statusText: backendError.response?.statusText,
-        data: backendError.response?.data
+        data: backendError.response?.data,
       });
-      
+
       // Generate WS URL if backend is completely unavailable
       console.log("🔄 Generating WS URL due to backend failure");
       const fallbackData = generateFallbackUrl(longUrl);
-      
+
       const totalTime = Date.now() - startTime;
-      logPerformance('totalTime', totalTime);
-      
+      logPerformance("totalTime", totalTime);
+
       log("⚠️ Using WS URL (backend unavailable):", {
         url: fallbackData.zimo_ws_url,
         totalTime: `${totalTime}ms`,
-        reason: "Backend unavailable"
+        reason: "Backend unavailable",
       });
-      
+
       // Return fallback data
       return {
         data: {
@@ -521,11 +740,10 @@ const shortenUrl = async (longUrl, visitorId) => {
           meta_image: onImage,
           on_image: onImage,
           clicks_count: 0,
-          is_fallback: true
-        }
+          is_fallback: true,
+        },
       };
     }
-    
   } catch (error) {
     const totalTime = Date.now() - startTime;
     logError("Error while shortening URL:", error.message || error);
@@ -540,7 +758,7 @@ const shortenUrl = async (longUrl, visitorId) => {
  * @param {string} visitorId - The visitor's ID
  * @returns {object} - Response from the redirect API
  */
-const getRedirect = async (alias , visitorId) => {
+const getRedirect = async (alias, visitorId) => {
   try {
     if (!alias || !visitorId) {
       throw new Error("Alias and visitor ID are required");
@@ -558,7 +776,6 @@ const getRedirect = async (alias , visitorId) => {
   }
 };
 
-
 /**
  * get all history of the visitor
  * @param {string} visitorId - ID of the visitor
@@ -568,7 +785,6 @@ const gethistory = async (visitorId) => {
     const { data } = await request_lamda3.get(
       `/api/url-history?visitor_id=${visitorId}`
     );
-    console.log("📜 API Response:", data);
     return data;
   } catch (e) {
     logError("error while fetching visitor", e.message);
@@ -606,23 +822,22 @@ const getUrlDetailsByAlias = async (alias) => {
       `/api/ws-url-details?alias=${alias}`
     );
     log("📋 URL details by alias:", data);
-    
+
     // Debug favicon specifically
     if (data && data.data) {
       log("🔍 Favicon debug:", {
         favicon_url: data.data.favicon_url,
         favicon: data.data.favicon,
-        has_favicon: !!data.data.favicon_url || !!data.data.favicon
+        has_favicon: !!data.data.favicon_url || !!data.data.favicon,
       });
     }
-    
+
     return data;
   } catch (e) {
     logError("Error while fetching URL details by alias:", e.message);
     throw e;
   }
 };
-
 
 /**
  * Fetch details for a short URL alias (for Chrome Extension WS)
@@ -638,18 +853,22 @@ const getExtensionDetails = async (alias) => {
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch extension details (status: ${response.status})`);
+      throw new Error(
+        `Failed to fetch extension details (status: ${response.status})`
+      );
     }
 
     const data = await response.json();
     console.log("🔍 Extension details response:", data);
     return data;
   } catch (error) {
-    console.error("❌ Error fetching extension details:", error.message || error);
+    console.error(
+      "❌ Error fetching extension details:",
+      error.message || error
+    );
     throw error;
   }
 };
-
 
 export {
   getUserLocation,
@@ -660,5 +879,5 @@ export {
   deleteHistory,
   getRedirect,
   getUrlDetailsByAlias,
-  getExtensionDetails
+  getExtensionDetails,
 };
