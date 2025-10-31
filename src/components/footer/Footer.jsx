@@ -13,7 +13,7 @@ export default function Footer({ start }) {
   }, [start]);
 
   return (
-    <footer className="text-[9px] mx-[20px] mb-[21.5px] uppercase tracking-[1.6px] leading-none">
+    <footer className="text-[9px] mx-[20px] mb-[21.5px] uppercase tracking-[1.6px] text-black leading-none font-medium">
       {showFooter && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -21,8 +21,6 @@ export default function Footer({ start }) {
           transition={{ duration: 0.5 }}
           className="flex flex-col gap-[15px]"
         >
-          {/* Top row: Links + Icons */}
-          <div className="flex justify-between items-center text-black leading-none text-[12px] font-medium">
             <p>
               <a
                 href="https://zimo.ws/legal/tpce"
@@ -33,19 +31,6 @@ export default function Footer({ start }) {
                 TERMS | PRIVACY
               </a>
             </p>
-            <div className="flex gap-[10px]">
-              <img
-                src="/images/footer/ZIMO WS.svg"
-                alt="Zimo Logo"
-                className="h-[10px]"
-              />
-              <img
-                src="/images/footer/Extension Chrome WS B.svg"
-                alt="Chrome Extension Icon"
-                className="h-[10px]"
-              />
-            </div>
-          </div>
 
           {/* Bottom row: Copyright */}
           <div>© COPYRIGHT 2025 WS | ZIMO GROUP LIMITED. ALL RIGHTS RESERVED.</div>

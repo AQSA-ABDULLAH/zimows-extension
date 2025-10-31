@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Footer from "../footer/Footer";
 import HistoryList from "../card/HistoryList";
 import { useSelector } from "react-redux";
 
@@ -40,7 +39,13 @@ function History({ setActivePage }) {
       {/* Scrollable content */}
       <div className="mt-[48px]">
         <HistoryList visitorId={visitorId} />
-        <Footer />
+      </div>
+
+      {/* <div className="fixed bottom-0 left-0 w-full bg-white p-[10px] flex justify-center items-center z-[200]">
+  © COPYRIGHT 2025 WS | ZIMO GROUP LIMITED. ALL RIGHTS RESERVED.
+</div> */}
+      <div className="w-full bg-white p-[10px] flex justify-center items-center z-[200]">
+        © COPYRIGHT 2025 WS | ZIMO GROUP LIMITED. ALL RIGHTS RESERVED.
       </div>
     </div>
   );

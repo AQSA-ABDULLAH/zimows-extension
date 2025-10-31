@@ -3,7 +3,7 @@
   "name": "WS by zimo",
   "version": "1.0",
   "description": "Custom Scrollbar",
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "geolocation"],
   "action": {
     "default_popup": "index.html",
     "default_title": "Open the popup",
