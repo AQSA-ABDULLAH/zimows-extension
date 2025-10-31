@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShortUrl } from "../../store/features/shortUrlSlice";
 import { addHistoryItem } from "../../store/features/historySlice";
-import { fetchExtensionDetails } from "../../store/features/extensionDetailsSlice";
 
 // -------------------- ✨ Typing Effect Hook --------------------
 function useTypingEffect(text, delay = 40, start = true) {

@@ -2,10 +2,6 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  setShortUrlData,
-  fetchUrlDetailsByAlias,
-} from "../../store/features/shortUrlSlice";
-import {
   updateHistoryItemClickCount,
   fetchHistory,
   deleteHistory,
@@ -63,25 +59,25 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
   }, [visitorId, dispatch]);
 
   // Set up 3-second interval to refresh history data - (Logic from Sidebar.js)
-  useEffect(() => {
-    if (!visitorId) return;
+  // useEffect(() => {
+  //   if (!visitorId) return;
 
-    if (historyIntervalRef.current) {
-      clearInterval(historyIntervalRef.current);
-    }
+  //   if (historyIntervalRef.current) {
+  //     clearInterval(historyIntervalRef.current);
+  //   }
 
-    dispatch(fetchHistory(visitorId)); // Fetch immediately
+  //   dispatch(fetchHistory(visitorId)); // Fetch immediately
 
-    historyIntervalRef.current = setInterval(() => {
-      dispatch(fetchHistory(visitorId));
-    }, 3000);
+  //   historyIntervalRef.current = setInterval(() => {
+  //     dispatch(fetchHistory(visitorId));
+  //   }, 3000);
 
-    return () => {
-      if (historyIntervalRef.current) {
-        clearInterval(historyIntervalRef.current);
-      }
-    };
-  }, [visitorId, dispatch]);
+  //   return () => {
+  //     if (historyIntervalRef.current) {
+  //       clearInterval(historyIntervalRef.current);
+  //     }
+  //   };
+  // }, [visitorId, dispatch]);
 
   // Handle Copy - (Logic from Sidebar.js)
   const handleCopy = async (url, itemId) => {

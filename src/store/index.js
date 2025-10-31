@@ -3,8 +3,7 @@ import visitorSlice from "./features/visitorSlice";
 import shortUrlSlice from "./features/shortUrlSlice";
 import historySlice from "./features/historySlice";
 import redirectSlice from "./features/redirectSlice";
-import linkSharedSlice from "./features/linkSharedSlice";
-import extensionDetailsReducer from "./features/extensionDetailsSlice";
+import linkSharedSlice from "./features/linkSharedSlice";;
 
 
 const store = configureStore({
@@ -15,7 +14,6 @@ const store = configureStore({
     history: historySlice,
     redirect: redirectSlice,
     linkShared: linkSharedSlice,
-    extensionDetails: extensionDetailsReducer,
   },
 });
 
