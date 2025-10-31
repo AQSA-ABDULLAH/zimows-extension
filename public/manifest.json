@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "WS by zimo",
+  "name": "WS by ZIMO",
   "version": "1.0",
-  "description": "Custom Scrollbar",
+  "description": "WS | ZIMO | Official Website | The Ultimate URL Shortening Service.",
   "permissions": ["tabs", "geolocation"],
   "action": {
     "default_popup": "index.html",
