@@ -101,6 +101,7 @@ function HistoryCard({
             onClick={onShowResultClick} // Prop se handler
             title="Show in main view"
           />
+
           <img
             src="/images/card/Copy Icon B.svg"
             alt="copy"

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   setShortUrlData,
   fetchUrlDetailsByAlias,
-} from "../../store/features/shortUrlSlice"; 
+} from "../../store/features/shortUrlSlice";
 import {
   updateHistoryItemClickCount,
   fetchHistory,
@@ -144,23 +144,12 @@ function HistoryList({ onClose, onDelete, visitorId, handleReset }) {
 
   // Handle showing result in main view - (Logic from Sidebar.js)
   const handleShowShortenedResult = async (item) => {
-    const alias = getAlias(item.zimo_ws_url);
-    if (!alias) return;
+    if (item?.zimo_ws_url) {
+      const alias = item.zimo_ws_url.split("/").pop(); // e.g. "nakf6O"
+      console.log("Extracted alias:", alias);
 
-    try {
-      dispatch(fetchUrlDetailsByAlias(alias)).unwrap();
-    } catch (e) {
-      dispatch(
-        setShortUrlData({
-          shortUrl: item.zimo_ws_url,
-          metaTitle: item.meta_title,
-          metaDescription: item.meta_description,
-          faviconUrl: item.favicon_url,
-          clicksCount: item.clicks_count,
-        })
-      );
-    } finally {
-      onClose?.(); // Close sidebar/panel
+      // Open zimo.ws with alias as query param in a new tab
+      window.open(`https://zimo.ws/?alias=${alias}`, "_blank");
     }
   };
 
