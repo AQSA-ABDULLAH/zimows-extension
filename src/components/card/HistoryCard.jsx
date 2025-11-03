@@ -51,11 +51,11 @@ function HistoryCard({
 
       <div className="flex flex-col justify-between h-[192px] text-[12px] no-underline text-[#000] tracking-[1.2px] ml-[10px] leading-none">
         {/* Top Section */}
-        <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
+        <div className="flex items-center gap-[43px] mt-[5px]">
           <img
             src={icon}
             alt="Logo"
-            className="h-[30px] w-[30px]"
+            className="h-[30px]"
             // Favicon fallback logic (from Sidebar.js)
             onError={(e) => {
               try {

@@ -251,7 +251,7 @@ export default function CardContent({ start, onAnimationComplete }) {
       {/* Right Content */}
       <div className="flex flex-col justify-between h-[192px] text-[12px] font-arial text-[#000] tracking-[1.2px] ml-[10px] leading-none">
         {/* Favicon + Short URL */}
-        <div className="flex items-center gap-[43px] h-[30px] mt-[5px]">
+        <div className="flex items-center gap-[43px] mt-[5px]">
           {showLogo && (
             <motion.img
               initial={{ opacity: 0 }}
@@ -262,7 +262,7 @@ export default function CardContent({ start, onAnimationComplete }) {
                 "images/card/logo/default-favicon.png"
               }
               alt="Favicon"
-              className="h-[30px] w-[30px]"
+              className="h-[30px]"
               onError={(e) =>
                 (e.target.src = "images/card/logo/default-favicon.png")
               }
