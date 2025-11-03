@@ -115,24 +115,6 @@ export default function CardContent({ start, onAnimationComplete }) {
       };
 
       setAnimationData(newData);
-
-      dispatch(
-        addHistoryItem({
-          short_url_id: shortUrlId,
-          zimo_ws_url: shortUrl,
-          original_url: reduxOriginalUrl,
-          meta_title: metaTitle,
-          meta_description: metaDescription,
-          favicon_url: faviconUrl,
-          on_image: onImage,
-          clicks_count: clicksCount || 0,
-          created_at: now.toISOString(),
-          time,
-          date,
-        })
-      );
-
-      hasAddedHistoryRef.current = true;
     }
   }, [
     status,
@@ -145,7 +127,7 @@ export default function CardContent({ start, onAnimationComplete }) {
     onImage,
     clicksCount,
     visitorId,
-    dispatch,
+
   ]);
 
   // -------------------- ⚠️ Handle API Error --------------------

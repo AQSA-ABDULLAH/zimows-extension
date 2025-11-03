@@ -179,30 +179,6 @@ const getVisitor = async (lat = null, lng = null) => {
   }
 };
 
-// advertisements
-const getBGData = async (countryName, page) => {
-  try {
-      const { data } = await request_lamda2.get(
-        `/api/advert-by-user-country?theme=&country_name=&page=${page}`,
-      );
-    return data;
-  } catch (e) {
-    console.log("error while fetching data", e.message);
-    throw e;
-  }
-};
-
-// record adverts view
-const advertView = async (view) => {
-  try {
-    const { data } = await request_lamda1.post("/api/advert-view", view);
-    return data;
-  } catch (e) {
-    console.log("error while fetching data", e.message);
-    throw e;
-  }
-};
-
 // countries list object
 const getCountries = async () => {
   try {
@@ -220,7 +196,7 @@ const getCountries = async () => {
  * @returns {object} - { faviconUrl, metaTitle, metaDescription, onImage }
  */
 const getMetadata = async (longUrl) => {
-  let customDescription = "";
+  // let customDescription = "";
   try {
     console.log('🔍 Fetching metadata for:', longUrl);
     
@@ -505,7 +481,7 @@ const getMetadata = async (longUrl) => {
         faviconUrl: selectedFavicon,
         metaTitle: data.title || data.metaTitle || "",
         // Priority still respects custom description if available
-        metaDescription: customDescription || data.description || "",
+        // metaDescription: customDescription || data.description || "",
         onImage: bestImage,
       };
 
@@ -864,8 +840,6 @@ const getUrlDetailsByAlias = async (alias) => {
 export {
   getUserLocation,
   getVisitor,
-  getBGData,
-  advertView,
   getCountries,
   gethistory,
   getMetadata,

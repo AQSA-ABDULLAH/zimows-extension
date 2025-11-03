@@ -32,4 +32,6 @@ export const tandp = {
 // Provide the BASE endpoint (no query). We'll append `?original_url=<encoded>`
 // This API will search for existing records in the database first
 // If record found, it will return that metadata; otherwise, proceed with normal flow
-export const CUSTOM_DESC_API = "/api/search-original-url";
+export const CUSTOM_DESC_API =
+  "https://backend-zimo-ws-213279879410.europe-west1.run.app/api/search-original-url";
+
